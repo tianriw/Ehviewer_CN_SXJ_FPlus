@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [ BiLi_PC_Gamer ]
+    branches: [ main ]
   pull_request:
-    branches: [ BiLi_PC_Gamer ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:

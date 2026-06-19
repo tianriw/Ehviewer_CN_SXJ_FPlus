@@ -75,6 +75,7 @@ import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.FavouriteStatusRouter;
 import com.tianri.ehviewer_fplus.R;
+import com.hippo.ehviewer.NamespaceFilter;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.callBack.SubscriptionCallback;
 import com.hippo.ehviewer.client.EhCacheKeyFactory;
@@ -167,6 +168,9 @@ public final class GalleryListScene extends BaseScene
     public final static String KEY_LIST_URL_BUILDER = "list_url_builder";
     public final static String KEY_HAS_FIRST_REFRESH = "has_first_refresh";
     public final static String KEY_STATE = "state";
+
+    private int mLastExcludedNamespaces = -1;
+    private int mLastMinTagCount = -1;
 
     final static int STATE_NORMAL = 0;
     final static int STATE_SIMPLE_SEARCH = 1;
@@ -1198,6 +1202,16 @@ public final class GalleryListScene extends BaseScene
             return;
         }
         mSubscriptionDraw.resume();
+        int currentExcludedNamespaces = Settings.getExcludedTagNamespaces();
+        int currentMinTagCount = Settings.getMinTagCount();
+        if (mLastExcludedNamespaces != currentExcludedNamespaces ||
+                mLastMinTagCount != currentMinTagCount) {
+            mLastExcludedNamespaces = currentExcludedNamespaces;
+            mLastMinTagCount = currentMinTagCount;
+            if (mHelper != null) {
+                mHelper.refresh();
+            }
+        }
     }
 
     @Override
@@ -1965,8 +1979,8 @@ public final class GalleryListScene extends BaseScene
             }
 
             mHelper.setEmptyString(emptyString);
-//            mHelper.onGetPageData(taskId, result.pages, result.nextPage, result.galleryInfoList);
-            mHelper.onGetPageData(taskId, result, result.galleryInfoList);
+            mHelper.onGetPageData(taskId, result,
+                    NamespaceFilter.filter(result.galleryInfoList));
         }
     }
 

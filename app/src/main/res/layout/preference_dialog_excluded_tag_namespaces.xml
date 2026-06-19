@@ -118,5 +118,68 @@
                 tools:ignore="HardcodedText"/>
 
         </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <CheckBox
+                android:id="@+id/tag_group_cosplayer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="cosplayer"
+                tools:ignore="HardcodedText"/>
+
+            <CheckBox
+                android:id="@+id/tag_group_mixed"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="mixed"
+                tools:ignore="HardcodedText"/>
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <CheckBox
+                android:id="@+id/tag_group_other"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="other"
+                tools:ignore="HardcodedText"/>
+
+            <CheckBox
+                android:id="@+id/tag_group_misc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="misc"
+                tools:ignore="HardcodedText"/>
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <CheckBox
+                android:id="@+id/tag_group_rows"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="rows"
+                tools:ignore="HardcodedText"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+
+        </TableRow>
     </TableLayout>
 </com.hippo.widget.IndicatingScrollView>

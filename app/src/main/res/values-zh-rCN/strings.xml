@@ -346,6 +346,8 @@
     <string name="tag_selector_selected_count">已选: %d</string>
     <string name="tag_selector_selected_section_title">已选标签</string>
     <string name="tag_selector_empty_selected">暂无已选标签</string>
+    <string name="namespace_excluded">已排除该标签组</string>
+    <string name="namespace_unexcluded">已恢复该标签组</string>
     <string name="tag_selector_other_group">其他</string>
 
     <!-- Download -->
@@ -533,9 +535,12 @@
     <string name="settings_eh_default_categories">主页分类显示</string>
     <string name="settings_eh_default_categories_summary">默认在主页所显示的分类</string>
     <string name="settings_eh_excluded_tag_namespaces">排除标签组</string>
-    <string name="settings_eh_excluded_tag_namespaces_summary">在默认搜索中排除指定标签组</string>
+    <string name="settings_eh_excluded_tag_namespaces_summary">在主页与搜索列表中隐藏指定标签组</string>
     <string name="settings_eh_excluded_languages">排除语言</string>
     <string name="settings_eh_excluded_languages_summary">在主页与搜索中隐藏指定语言的画廊</string>
+    <string name="settings_eh_min_tag_count">最少标签数量</string>
+    <string name="settings_eh_min_tag_count_summary">在主页与搜索列表中隐藏标签少于 %d 个的画廊</string>
+    <string name="settings_eh_min_tag_count_summary_off">已关闭</string>
     <string name="settings_eh_show_jpn_title">显示日文标题</string>
     <string name="settings_eh_show_gallery_comment">显示画廊评论</string>
     <string name="settings_eh_show_gallery_rating">显示画廊评分</string>

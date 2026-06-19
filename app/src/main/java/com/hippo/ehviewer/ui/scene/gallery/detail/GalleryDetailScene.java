@@ -65,6 +65,7 @@ import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
 import com.tianri.ehviewer_fplus.R;
+import com.hippo.ehviewer.NamespaceFilter;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.UrlOpener;
 import com.hippo.ehviewer.client.EhCacheKeyFactory;
@@ -1108,6 +1109,8 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
             ll.addView(tgName);
             tgName.setText(readableTagName != null ? readableTagName : tg.groupName);
             tgName.setBackgroundDrawable(new RoundSideRectDrawable(colorName));
+            tgName.setTag(R.id.tag, tg.groupName);
+            tgName.setOnLongClickListener(this);
 
             String prefix = EhTagDatabase.namespaceToPrefix(tg.groupName);
             if (prefix == null) {
@@ -1651,6 +1654,13 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
                 }).show();
     }
 
+    private void toggleNamespaceExclusion(String ns) {
+        boolean nowExcluded = NamespaceFilter.toggleNamespaceExclusion(ns);
+        Toast.makeText(getEHContext(),
+                nowExcluded ? R.string.namespace_excluded : R.string.namespace_unexcluded,
+                Toast.LENGTH_SHORT).show();
+    }
+
     private void showTagDialog(final String tag) {
         if (tagDialog == null) {
             tagDialog = new GalleryListSceneDialog(this);
@@ -1698,8 +1708,17 @@ public class GalleryDetailScene extends BaseScene implements View.OnClickListene
         } else {
             String tag = (String) v.getTag(R.id.tag);
             if (null != tag) {
-                showTagDialog(tag);
-                return true;
+                if (tag.indexOf(':') < 0) {
+                    if (NamespaceFilter.isKnownNamespace(tag)) {
+                        // Namespace header: long-press toggles exclusion for the whole namespace.
+                        toggleNamespaceExclusion(tag);
+                        return true;
+                    }
+                    return false;
+                } else {
+                    showTagDialog(tag);
+                    return true;
+                }
             }
         }
 

@@ -17,6 +17,7 @@ import android.view.animation.BounceInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
@@ -28,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.flexbox.FlexboxLayout;
 
 import com.tianri.ehviewer_fplus.R;
+import com.hippo.ehviewer.NamespaceFilter;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhTagDatabase;
 
@@ -267,6 +269,17 @@ public class TagSelectorActivity extends EhActivity {
         return ns.substring(0, 1).toUpperCase(Locale.US) + ns.substring(1);
     }
 
+    private boolean isNamespaceExcluded(String ns) {
+        return NamespaceFilter.isNamespaceExcluded(ns);
+    }
+
+    private void toggleNamespaceExclusion(String ns) {
+        boolean nowExcluded = NamespaceFilter.toggleNamespaceExclusion(ns);
+        Toast.makeText(this,
+                nowExcluded ? R.string.namespace_excluded : R.string.namespace_unexcluded,
+                Toast.LENGTH_SHORT).show();
+    }
+
     private void initGroupsStructure() {
         allGroups.clear();
 
@@ -295,6 +308,11 @@ public class TagSelectorActivity extends EhActivity {
         allGroups.add(new TagGroup("Group", "group", 12));
         allGroups.add(new TagGroup("Artist", "artist", 12));
         allGroups.add(new TagGroup("Cosplayer", "cosplayer", 12));
+        allGroups.add(new TagGroup("Mixed", "mixed", 12));
+        allGroups.add(new TagGroup("Other", "other", 12));
+        allGroups.add(new TagGroup("Misc", "misc", 12));
+        allGroups.add(new TagGroup("Rows", "rows", 12));
+        allGroups.add(new TagGroup("Reclass", "reclass", 12));
 
         // Preload standard groups
         // 预加载其他分组
@@ -537,12 +555,27 @@ public class TagSelectorActivity extends EhActivity {
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             if (viewType == TYPE_HEADER) {
+                android.widget.LinearLayout container = new android.widget.LinearLayout(parent.getContext());
+                container.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+                container.setGravity(Gravity.CENTER_VERTICAL);
+                container.setPadding(32, 48, 16, 16);
+
                 TextView tv = new TextView(parent.getContext());
-                tv.setPadding(32, 48, 16, 16);
                 tv.setTextSize(18);
                 tv.setTextColor(colorHeader);
                 tv.getPaint().setFakeBoldText(true);
-                return new RecyclerView.ViewHolder(tv) {};
+                container.addView(tv);
+
+                TextView btnBlock = new TextView(parent.getContext());
+                btnBlock.setText(" ⊗");
+                btnBlock.setTextSize(18);
+                btnBlock.setTextColor(Color.parseColor("#FF5252"));
+                btnBlock.setPadding(24, 8, 8, 8);
+                btnBlock.setClickable(true);
+                btnBlock.setFocusable(true);
+                container.addView(btnBlock);
+
+                return new HeaderViewHolder(container, tv, btnBlock);
             }
             else if (viewType == TYPE_FOOTER) {
                 // Footer with Expand/Collapse buttons
@@ -582,7 +615,24 @@ public class TagSelectorActivity extends EhActivity {
             int type = getItemViewType(position);
             Object obj = displayList.get(position);
 
-            if (type == TYPE_HEADER) { ((TextView) holder.itemView).setText(((TagGroup) obj).title); }
+            if (type == TYPE_HEADER) {
+                TagGroup group = (TagGroup) obj;
+                HeaderViewHolder hv = (HeaderViewHolder) holder;
+                hv.namespace = group.namespace;
+                hv.tv.setText(group.title);
+                boolean canExclude = NamespaceFilter.isKnownNamespace(group.namespace);
+                boolean excluded = isNamespaceExcluded(group.namespace);
+                hv.btnBlock.setVisibility(canExclude ? View.VISIBLE : View.GONE);
+                if (canExclude) {
+                    hv.btnBlock.setText(excluded ? " ⊘" : " ⊗");
+                    hv.btnBlock.setOnClickListener(v -> {
+                        toggleNamespaceExclusion(group.namespace);
+                        adapter.notifyDataSetChanged();
+                    });
+                } else {
+                    hv.btnBlock.setOnClickListener(null);
+                }
+            }
             else if (type == TYPE_FOOTER) {
                 FooterItem footer = (FooterItem) obj; TagGroup group = footer.group; FooterViewHolder vh = (FooterViewHolder) holder;
 
@@ -680,6 +730,7 @@ public class TagSelectorActivity extends EhActivity {
         }
 
         @Override public int getItemCount() { return displayList.size(); }
+        class HeaderViewHolder extends RecyclerView.ViewHolder { TextView tv; TextView btnBlock; String namespace; HeaderViewHolder(View container, TextView tv, TextView btnBlock) { super(container); this.tv = tv; this.btnBlock = btnBlock; } }
         class TagViewHolder extends RecyclerView.ViewHolder { TextView tv; TagViewHolder(View v) { super(v); tv = v.findViewById(R.id.tv_tag_name); } }
         class FooterViewHolder extends RecyclerView.ViewHolder { TextView tvExpand, tvCollapse; FooterViewHolder(View v, TextView e, TextView c) { super(v); tvExpand=e; tvCollapse=c; } }
     }

@@ -94,7 +94,7 @@ public class Settings {
         ehConfig.imageSize = getImageResolution();
         ehConfig.excludedLanguages = getExcludedLanguages();
         ehConfig.defaultCategories = getDefaultCategories();
-        ehConfig.excludedNamespaces = getExcludedTagNamespaces();
+        ehConfig.excludedNamespaces = NamespaceFilter.toServerMask(getExcludedTagNamespaces());
         ehConfig.setDirty();
         return ehConfig;
     }
@@ -510,9 +510,20 @@ public class Settings {
     }
 
     public static void putExcludedTagNamespaces(int value) {
-        sEhConfig.excludedNamespaces = value;
+        sEhConfig.excludedNamespaces = NamespaceFilter.toServerMask(value);
         sEhConfig.setDirty();
         putInt(KEY_EXCLUDED_TAG_NAMESPACES, value);
+    }
+
+    public static final String KEY_MIN_TAG_COUNT = "min_tag_count";
+    private static final int DEFAULT_MIN_TAG_COUNT = 0;
+
+    public static int getMinTagCount() {
+        return getInt(KEY_MIN_TAG_COUNT, DEFAULT_MIN_TAG_COUNT);
+    }
+
+    public static void putMinTagCount(int value) {
+        putInt(KEY_MIN_TAG_COUNT, Math.max(value, 0));
     }
 
     public static final String KEY_EXCLUDED_LANGUAGES = "excluded_languages";

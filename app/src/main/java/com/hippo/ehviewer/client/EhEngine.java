@@ -27,6 +27,7 @@ import androidx.annotation.Nullable;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.GetText;
+import com.hippo.ehviewer.NamespaceFilter;
 import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.data.ArchiverData;
@@ -218,12 +219,12 @@ public class EhEngine {
             }
         }
 
-        boolean hasTags = false;
+        boolean missingTags = false;
         boolean hasPages = false;
         boolean hasRated = false;
         for (GalleryInfo gi : list) {
-            if (gi.simpleTags != null) {
-                hasTags = true;
+            if (gi.simpleTags == null || gi.simpleTags.length == 0) {
+                missingTags = true;
             }
             if (gi.pages != 0) {
                 hasPages = true;
@@ -233,7 +234,7 @@ public class EhEngine {
             }
         }
 
-        boolean needApi = (filter && sEhFilter.needTags() && !hasTags) ||
+        boolean needApi = (filter && (sEhFilter.needTags() || NamespaceFilter.needTags()) && missingTags) ||
                 (Settings.getShowGalleryPages() && !hasPages) ||
                 hasRated;
         if (needApi) {
@@ -251,6 +252,7 @@ public class EhEngine {
                     n--;
                 }
             }
+            NamespaceFilter.filterInPlace(list);
         }
 
         for (GalleryInfo info : list) {

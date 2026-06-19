@@ -61,6 +61,7 @@ import com.hippo.easyrecyclerview.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhDB
 import com.tianri.ehviewer_fplus.R
+import com.hippo.ehviewer.NamespaceFilter
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhEngine
@@ -1123,7 +1124,7 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
 
             updateSearchBar()
             //            mHelper.onGetPageData(taskId, result.pages, result.nextPage, result.galleryInfoList);
-            mHelper!!.onGetPageData(taskId, result, result.galleryInfoList)
+            mHelper!!.onGetPageData(taskId, result, NamespaceFilter.filter(result.galleryInfoList))
 
             if (mDrawerAdapter != null) {
                 mDrawerAdapter!!.notifyDataSetChanged()
@@ -1157,7 +1158,7 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
             if (list.size == 0) {
                 mHelper!!.onGetPageData(taskId, 0, 0, ArrayList())
             } else {
-                mHelper!!.onGetPageData(taskId, 1, 0, list)
+                mHelper!!.onGetPageData(taskId, 1, 0, NamespaceFilter.filter(list))
             }
 
             if (favCat == FavListUrlBuilder.FAV_CAT_LOCAL && TextUtils.isEmpty(keyword)) {

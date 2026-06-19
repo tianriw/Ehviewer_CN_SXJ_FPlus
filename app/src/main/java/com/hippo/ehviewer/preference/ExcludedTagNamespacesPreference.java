@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import androidx.appcompat.app.AlertDialog;
 import com.tianri.ehviewer_fplus.R;
+import com.hippo.ehviewer.NamespaceFilter;
 import com.hippo.ehviewer.Settings;
 import com.hippo.preference.DialogPreference;
 import com.hippo.lib.yorozuya.NumberUtils;
@@ -40,17 +41,27 @@ public class ExcludedTagNamespacesPreference extends DialogPreference {
             R.id.tag_group_artist,
             R.id.tag_group_male,
             R.id.tag_group_female,
+            R.id.tag_group_cosplayer,
+            R.id.tag_group_mixed,
+            R.id.tag_group_other,
+            R.id.tag_group_misc,
+            R.id.tag_group_rows,
     };
 
     private static final int[] EXCLUDED_TAG_GROUP_ID = {
-            0x1,
-            0x2,
-            0x4,
-            0x8,
-            0x10,
-            0x20,
-            0x40,
-            0x80
+            NamespaceFilter.BIT_RECLASS,
+            NamespaceFilter.BIT_LANGUAGE,
+            NamespaceFilter.BIT_PARODY,
+            NamespaceFilter.BIT_CHARACTER,
+            NamespaceFilter.BIT_GROUP,
+            NamespaceFilter.BIT_ARTIST,
+            NamespaceFilter.BIT_MALE,
+            NamespaceFilter.BIT_FEMALE,
+            NamespaceFilter.BIT_COSPLAYER,
+            NamespaceFilter.BIT_MIXED,
+            NamespaceFilter.BIT_OTHER,
+            NamespaceFilter.BIT_MISC,
+            NamespaceFilter.BIT_ROWS
     };
 
     public ExcludedTagNamespacesPreference(Context context) {

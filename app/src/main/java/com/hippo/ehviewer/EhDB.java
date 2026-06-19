@@ -21,6 +21,7 @@ import static com.hippo.ehviewer.ui.fragment.AdvancedFragment.LOADING_PROGRESS;
 import static com.hippo.ehviewer.ui.fragment.AdvancedFragment.LOADING_STATUS;
 
 import android.content.Context;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -28,6 +29,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -60,6 +62,7 @@ import com.hippo.util.SqlUtils;
 import com.hippo.lib.yorozuya.IOUtils;
 import com.hippo.lib.yorozuya.ObjectUtils;
 import com.hippo.lib.yorozuya.collect.SparseJLArray;
+import com.tianri.ehviewer_fplus.R;
 
 import org.greenrobot.greendao.AbstractDao;
 import org.greenrobot.greendao.query.CloseableListIterator;
@@ -84,6 +87,14 @@ public class EhDB {
     public static int MAX_HISTORY_COUNT = 100;
 
     private static DaoSession sDaoSession;
+    private static SQLiteDatabase sDatabase;
+    private static final String[] FEATURE_TABLES = {
+            "CLOUD_FAVORITE_CATEGORY",
+            "CLOUD_FAVORITE_MAP",
+            "TRACKED_TAG",
+            "TRACKED_GALLERY",
+            "READING_EVENT"
+    };
 
     private static boolean sHasOldDB;
     private static boolean sNewDB;
@@ -208,10 +219,37 @@ public class EhDB {
                 context.getApplicationContext(), "eh.db", null);
 
         SQLiteDatabase db = helper.getWritableDatabase();
+        sDatabase = db;
+        createFeatureTables(db);
         DaoMaster daoMaster = new DaoMaster(db);
 
         sDaoSession = daoMaster.newSession();
         MAX_HISTORY_COUNT = Settings.getHistoryInfoSize();
+    }
+
+    private static void createFeatureTables(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS CLOUD_FAVORITE_CATEGORY (" +
+                "SLOT INTEGER PRIMARY KEY, NAME TEXT, ITEM_COUNT INTEGER NOT NULL, UPDATED INTEGER NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS CLOUD_FAVORITE_MAP (" +
+                "GID INTEGER NOT NULL, SLOT INTEGER NOT NULL, UPDATED INTEGER NOT NULL, " +
+                "PRIMARY KEY (GID, SLOT))");
+        db.execSQL("CREATE TABLE IF NOT EXISTS TRACKED_TAG (" +
+                "NAME TEXT PRIMARY KEY, SOURCE INTEGER NOT NULL, ENABLED INTEGER NOT NULL, " +
+                "BASELINE_GID INTEGER NOT NULL, LAST_SCAN INTEGER NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS TRACKED_GALLERY (" +
+                "GID INTEGER PRIMARY KEY, DATA TEXT NOT NULL, MATCHED_TAGS TEXT, " +
+                "DISCOVERED INTEGER NOT NULL, IS_READ INTEGER NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS READING_EVENT (" +
+                "ID INTEGER PRIMARY KEY AUTOINCREMENT, GID INTEGER NOT NULL, TIME INTEGER NOT NULL, " +
+                "DATA TEXT NOT NULL, TAGS TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS PAGE_BOOKMARK (" +
+                "ID INTEGER PRIMARY KEY AUTOINCREMENT, GID INTEGER NOT NULL, PAGE INTEGER NOT NULL, " +
+                "NOTE TEXT, TIME INTEGER NOT NULL, DATA TEXT NOT NULL)");
+        db.execSQL("CREATE INDEX IF NOT EXISTS IDX_PAGE_BOOKMARK_GID ON PAGE_BOOKMARK (GID)");
+    }
+
+    public static synchronized SQLiteDatabase getRawDatabase() {
+        return sDatabase;
     }
 
     public static boolean needMerge() {
@@ -655,6 +693,180 @@ public class EhDB {
         }
     }
 
+    // ---------------- Page bookmarks (per-page anchors with optional note) ----------------
+
+    public static synchronized long addBookmark(@NonNull GalleryInfo info, int page, @Nullable String note) {
+        SQLiteDatabase db = getRawDatabase();
+        long now = System.currentTimeMillis();
+        String data = info.toJson().toJSONString();
+        ContentValues cv = new ContentValues();
+        cv.put("GID", info.gid);
+        cv.put("PAGE", page);
+        cv.put("NOTE", note);
+        cv.put("TIME", now);
+        cv.put("DATA", data);
+        return db.insert("PAGE_BOOKMARK", null, cv);
+    }
+
+    public static synchronized void removeBookmark(long id) {
+        getRawDatabase().delete("PAGE_BOOKMARK", "ID = ?", new String[]{Long.toString(id)});
+    }
+
+    public static synchronized void removeBookmark(long gid, int page) {
+        getRawDatabase().delete("PAGE_BOOKMARK", "GID = ? AND PAGE = ?",
+                new String[]{Long.toString(gid), Integer.toString(page)});
+    }
+
+    public static synchronized void updateBookmarkNote(long id, @Nullable String note) {
+        ContentValues cv = new ContentValues();
+        cv.put("NOTE", note);
+        getRawDatabase().update("PAGE_BOOKMARK", cv, "ID = ?", new String[]{Long.toString(id)});
+    }
+
+    @NonNull
+    public static synchronized List<PageBookmark> getBookmarks(long gid) {
+        List<PageBookmark> result = new ArrayList<>();
+        SQLiteDatabase db = getRawDatabase();
+        try (Cursor cursor = db.rawQuery(
+                "SELECT ID, PAGE, NOTE, TIME, DATA FROM PAGE_BOOKMARK WHERE GID = ? ORDER BY PAGE ASC",
+                new String[]{Long.toString(gid)})) {
+            while (cursor.moveToNext()) {
+                result.add(readBookmarkRow(cursor));
+            }
+        }
+        return result;
+    }
+
+    @NonNull
+    public static synchronized List<PageBookmark> getAllBookmarks() {
+        List<PageBookmark> result = new ArrayList<>();
+        SQLiteDatabase db = getRawDatabase();
+        try (Cursor cursor = db.rawQuery(
+                "SELECT ID, PAGE, NOTE, TIME, DATA FROM PAGE_BOOKMARK ORDER BY TIME DESC", null)) {
+            while (cursor.moveToNext()) {
+                result.add(readBookmarkRow(cursor));
+            }
+        }
+        return result;
+    }
+
+    public static synchronized void clearAllBookmarks() {
+        getRawDatabase().delete("PAGE_BOOKMARK", null, null);
+    }
+
+    @NonNull
+    private static PageBookmark readBookmarkRow(@NonNull Cursor cursor) {
+        long id = cursor.getLong(0);
+        int page = cursor.getInt(1);
+        String note = cursor.isNull(2) ? null : cursor.getString(2);
+        long time = cursor.getLong(3);
+        String data = cursor.getString(4);
+        GalleryInfo info = GalleryInfo.galleryInfoFromJson(
+                com.alibaba.fastjson.JSONObject.parseObject(data));
+        return new PageBookmark(id, page, note, time, info);
+    }
+
+    public static final class PageBookmark {
+        public final long id;
+        public final int page;
+        @Nullable
+        public final String note;
+        public final long time;
+        @NonNull
+        public final GalleryInfo info;
+
+        public PageBookmark(long id, int page, @Nullable String note, long time, @NonNull GalleryInfo info) {
+            this.id = id;
+            this.page = page;
+            this.note = note;
+            this.time = time;
+            this.info = info;
+        }
+    }
+
+    public static synchronized void replaceCloudFavoriteCategory(
+            int slot, String name, List<GalleryInfo> galleryInfoList) {
+        if (sDatabase == null || slot < 0 || slot > 9) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        sDatabase.beginTransaction();
+        try {
+            sDatabase.execSQL("DELETE FROM CLOUD_FAVORITE_MAP WHERE SLOT = ?", new Object[]{slot});
+            for (GalleryInfo info : galleryInfoList) {
+                sDatabase.execSQL(
+                        "INSERT OR REPLACE INTO CLOUD_FAVORITE_MAP (GID, SLOT, UPDATED) VALUES (?, ?, ?)",
+                        new Object[]{info.gid, slot, now});
+            }
+            sDatabase.execSQL(
+                    "INSERT OR REPLACE INTO CLOUD_FAVORITE_CATEGORY " +
+                            "(SLOT, NAME, ITEM_COUNT, UPDATED) VALUES (?, ?, ?, ?)",
+                    new Object[]{slot, name, galleryInfoList.size(), now});
+            sDatabase.setTransactionSuccessful();
+        } finally {
+            sDatabase.endTransaction();
+        }
+    }
+
+    public static synchronized String[] getCloudFavoriteCategoryNames() {
+        String[] result = new String[10];
+        if (sDatabase == null) {
+            return result;
+        }
+        try (Cursor cursor = sDatabase.rawQuery(
+                "SELECT SLOT, NAME FROM CLOUD_FAVORITE_CATEGORY", null)) {
+            while (cursor.moveToNext()) {
+                int slot = cursor.getInt(0);
+                if (slot >= 0 && slot < result.length) {
+                    result[slot] = cursor.getString(1);
+                }
+            }
+        }
+        return result;
+    }
+
+    public static synchronized int[] getCloudFavoriteCategoryCounts() {
+        int[] result = new int[10];
+        if (sDatabase == null) {
+            return result;
+        }
+        try (Cursor cursor = sDatabase.rawQuery(
+                "SELECT SLOT, ITEM_COUNT FROM CLOUD_FAVORITE_CATEGORY", null)) {
+            while (cursor.moveToNext()) {
+                int slot = cursor.getInt(0);
+                if (slot >= 0 && slot < result.length) {
+                    result[slot] = cursor.getInt(1);
+                }
+            }
+        }
+        return result;
+    }
+
+    public static synchronized List<GalleryInfo> getCloudFavoriteCategory(
+            int slot, @Nullable String keyword) {
+        List<GalleryInfo> result = new ArrayList<>();
+        if (sDatabase == null || slot < 0 || slot > 9) {
+            return result;
+        }
+        LocalFavoritesDao dao = sDaoSession.getLocalFavoritesDao();
+        try (Cursor cursor = sDatabase.rawQuery(
+                "SELECT GID FROM CLOUD_FAVORITE_MAP WHERE SLOT = ? ORDER BY UPDATED DESC",
+                new String[]{Integer.toString(slot)})) {
+            while (cursor.moveToNext()) {
+                LocalFavoriteInfo info = dao.load(cursor.getLong(0));
+                if (info == null) {
+                    continue;
+                }
+                if (TextUtils.isEmpty(keyword)
+                        || info.title != null
+                        && info.title.toLowerCase().contains(keyword.toLowerCase())) {
+                    result.add(info);
+                }
+            }
+        }
+        return result;
+    }
+
 
     public static synchronized List<BlackList> getAllBlackList() {
         BlackListDao dao = sDaoSession.getBlackListDao();
@@ -903,6 +1115,39 @@ public class EhDB {
         return true;
     }
 
+    private static void copyFeatureTable(SQLiteDatabase from, SQLiteDatabase to, String table,
+                                         boolean keepPrimaryKey) {
+        try (Cursor cursor = from.query(table, null, null, null, null, null, null)) {
+            String[] columns = cursor.getColumnNames();
+            while (cursor.moveToNext()) {
+                ContentValues values = new ContentValues(columns.length);
+                for (int i = 0; i < columns.length; i++) {
+                    if (!keepPrimaryKey && "ID".equals(columns[i])) {
+                        continue;
+                    }
+                    switch (cursor.getType(i)) {
+                        case Cursor.FIELD_TYPE_INTEGER:
+                            values.put(columns[i], cursor.getLong(i));
+                            break;
+                        case Cursor.FIELD_TYPE_FLOAT:
+                            values.put(columns[i], cursor.getDouble(i));
+                            break;
+                        case Cursor.FIELD_TYPE_STRING:
+                            values.put(columns[i], cursor.getString(i));
+                            break;
+                        case Cursor.FIELD_TYPE_BLOB:
+                            values.put(columns[i], cursor.getBlob(i));
+                            break;
+                        case Cursor.FIELD_TYPE_NULL:
+                            values.putNull(columns[i]);
+                            break;
+                    }
+                }
+                to.insertWithOnConflict(table, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            }
+        }
+    }
+
     public static synchronized boolean exportDB(Context context, File file) {
         final String ehExportName = "eh.export.db";
 
@@ -922,6 +1167,7 @@ public class EhDB {
         try {
             // Copy data to a export db
             try (SQLiteDatabase db = helper.getWritableDatabase()) {
+                createFeatureTables(db);
                 DaoMaster daoMaster = new DaoMaster(db);
                 DaoSession exportSession = daoMaster.newSession();
                 if (! copyDao(sDaoSession.getDownloadsDao(), exportSession.getDownloadsDao()))
@@ -940,6 +1186,9 @@ public class EhDB {
                     return false;
                 if (!copyDao(sDaoSession.getFilterDao(), exportSession.getFilterDao()))
                     return false;
+                for (String table : FEATURE_TABLES) {
+                    copyFeatureTable(sDatabase, db, table, true);
+                }
             }
 
             // Copy export db to data dir
@@ -984,6 +1233,7 @@ public class EhDB {
             } else if (oldVersion > newVersion) {
                 return context.getString(R.string.cant_read_the_file);
             }
+            createFeatureTables(db);
 
             DaoMaster daoMaster = new DaoMaster(db);
             DaoSession session = daoMaster.newSession();
@@ -1058,6 +1308,10 @@ public class EhDB {
                 if (!currentGalleryTags.contains(tags)) {
                     insertGalleryTags(tags);
                 }
+            }
+
+            for (String table : FEATURE_TABLES) {
+                copyFeatureTable(db, sDatabase, table, !"READING_EVENT".equals(table));
             }
 
             return null;

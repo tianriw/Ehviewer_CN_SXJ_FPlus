@@ -17,7 +17,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.callBack.SubscriptionCallback;
 import com.hippo.ehviewer.client.EhClient;
 import com.hippo.ehviewer.client.EhRequest;

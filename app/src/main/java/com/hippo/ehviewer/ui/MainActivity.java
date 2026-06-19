@@ -64,7 +64,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.hippo.drawerlayout.DrawerLayout;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.callBack.ImageChangeCallBack;
 import com.hippo.ehviewer.client.EhCookieStore;
@@ -89,6 +89,10 @@ import com.hippo.ehviewer.ui.scene.gallery.list.SubscriptionsScene;
 import com.hippo.ehviewer.ui.scene.sign.GetProfileScene;
 import com.hippo.ehviewer.ui.scene.topList.EhTopListScene;
 import com.hippo.ehviewer.ui.scene.history.HistoryScene;
+import com.hippo.ehviewer.ui.scene.bookmark.BookmarksScene;
+import com.hippo.ehviewer.ui.scene.tracking.TrackingScene;
+import com.hippo.ehviewer.ui.scene.statistics.StatisticsScene;
+import com.hippo.ehviewer.ui.scene.live.LiveModeScene;
 import com.hippo.ehviewer.ui.scene.ProgressScene;
 import com.hippo.ehviewer.ui.scene.gallery.list.QuickSearchScene;
 import com.hippo.ehviewer.ui.scene.SecurityScene;
@@ -192,6 +196,10 @@ public final class MainActivity extends StageActivity
         registerLaunchMode(DownloadLabelsScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(FavoritesScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(HistoryScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TOP);
+        registerLaunchMode(BookmarksScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
+        registerLaunchMode(TrackingScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
+        registerLaunchMode(StatisticsScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
+        registerLaunchMode(LiveModeScene.class, SceneFragment.LAUNCH_MODE_SINGLE_TASK);
         registerLaunchMode(ProgressScene.class, SceneFragment.LAUNCH_MODE_STANDARD);
     }
 
@@ -300,6 +308,9 @@ public final class MainActivity extends StageActivity
     }
 
     private boolean handleIntent(Intent intent) {
+        if (Settings.getLiveMode()) {
+            return false;
+        }
         if (intent == null) {
             return false;
         }
@@ -348,6 +359,10 @@ public final class MainActivity extends StageActivity
 
     @Override
     protected void onUnrecognizedIntent(@Nullable Intent intent) {
+        if (Settings.getLiveMode()) {
+            startSceneFirstly(new Announcer(LiveModeScene.class));
+            return;
+        }
         Class<?> clazz = getTopSceneClass();
         if (clazz != null && SolidScene.class.isAssignableFrom(clazz)) {
             // TODO the intent lost
@@ -410,6 +425,24 @@ public final class MainActivity extends StageActivity
 //        mDrawerLayout.setStatusBarColor(0);
 
         if (mNavView != null) {
+            boolean liveMode = Settings.getLiveMode();
+            for (int i = 0; i < mNavView.getMenu().size(); i++) {
+                MenuItem navItem = mNavView.getMenu().getItem(i);
+                int itemId = navItem.getItemId();
+                if (itemId == 0) {
+                    navItem.setVisible(false);
+                } else if (itemId == R.id.nav_live_mode) {
+                    navItem.setVisible(liveMode);
+                } else {
+                    navItem.setVisible(!liveMode);
+                }
+            }
+            if (!liveMode) {
+                MenuItem statisticsItem = mNavView.getMenu().findItem(R.id.nav_statistics);
+                if (statisticsItem != null) {
+                    statisticsItem.setVisible(Settings.getReadingStatisticsEnabled());
+                }
+            }
 //            if (Settings.isLogin()){
 //                MenuItem newsItem = mNavView.getMenu().findItem(R.id.nav_eh_news);
 //                newsItem.setVisible(true);
@@ -435,21 +468,27 @@ public final class MainActivity extends StageActivity
         });
 
         if (savedInstanceState == null) {
-            onInit();
-            checkDownloadLocation();
-            if (Settings.getCellularNetworkWarning()) {
-                checkCellularNetwork();
+            if (!Settings.getLiveMode()) {
+                onInit();
+                checkDownloadLocation();
+                if (Settings.getCellularNetworkWarning()) {
+                    checkCellularNetwork();
+                }
             }
         } else {
             onRestore(savedInstanceState);
         }
-        EhTagDatabase.update(this);
+        if (Settings.getLiveMode()) {
+            startSceneFirstly(new Announcer(LiveModeScene.class));
+        } else {
+            EhTagDatabase.update(this);
+        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (!Settings.getCloseAutoUpdate()){
+        if (!Settings.getLiveMode() && !Settings.getCloseAutoUpdate()){
             AppUpdater.update(this,false);
         }
     }
@@ -841,7 +880,9 @@ public final class MainActivity extends StageActivity
         mNavCheckedItem = resId;
         if (mNavView != null) {
             if (resId == 0) {
-                mNavView.setCheckedItem(R.id.nav_stub);
+                for (int i = 0; i < mNavView.getMenu().size(); i++) {
+                    mNavView.getMenu().getItem(i).setChecked(false);
+                }
             } else {
                 mNavView.setCheckedItem(resId);
             }
@@ -879,6 +920,13 @@ public final class MainActivity extends StageActivity
     @SuppressLint({"NonConstantResourceId", "RtlHardcoded"})
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        if (Settings.getLiveMode()) {
+            startSceneFirstly(new Announcer(LiveModeScene.class));
+            if (mDrawerLayout != null) {
+                mDrawerLayout.closeDrawers();
+            }
+            return true;
+        }
         // Don't select twice
         if (item.isChecked()) {
             return false;
@@ -899,6 +947,9 @@ public final class MainActivity extends StageActivity
                 startSceneFirstly(new Announcer(GalleryListScene.class)
                         .setArgs(nav_subscription));
                 break;
+            case R.id.nav_tracking:
+                startScene(new Announcer(TrackingScene.class));
+                break;
             case R.id.nav_whats_hot:
                 Bundle nav_whats_hot = new Bundle();
                 nav_whats_hot.putString(GalleryListScene.KEY_ACTION, GalleryListScene.ACTION_WHATS_HOT);
@@ -917,6 +968,12 @@ public final class MainActivity extends StageActivity
             case R.id.nav_history:
                 startScene(new Announcer(HistoryScene.class));
                 break;
+            case R.id.nav_bookmarks:
+                startScene(new Announcer(BookmarksScene.class));
+                break;
+            case R.id.nav_statistics:
+                startScene(new Announcer(StatisticsScene.class));
+                break;
             case R.id.nav_downloads:
                 startScene(new Announcer(DownloadsScene.class));
                 break;
@@ -928,7 +985,7 @@ public final class MainActivity extends StageActivity
                 throw new IllegalStateException("Unexpected value: " + item.getItemId());
         }
 
-        if (id != R.id.nav_stub && mDrawerLayout != null) {
+        if (mDrawerLayout != null) {
             mDrawerLayout.closeDrawers();
         }
 

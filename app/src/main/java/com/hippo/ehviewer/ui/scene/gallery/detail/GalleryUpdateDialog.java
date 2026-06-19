@@ -7,7 +7,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.client.data.GalleryDetail;
 import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.ui.MainActivity;

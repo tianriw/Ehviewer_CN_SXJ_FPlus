@@ -21,7 +21,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceFragmentCompat;
 
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 
 public class ReadFragment extends BasePreferenceFragmentCompat {
 

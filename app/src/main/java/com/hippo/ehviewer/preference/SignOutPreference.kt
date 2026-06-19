@@ -20,7 +20,7 @@ import android.content.Intent
 import android.util.AttributeSet
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import com.hippo.ehviewer.R
+import com.tianri.ehviewer_fplus.R
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.ui.splash.SplashActivity
 import com.hippo.preference.MessagePreference

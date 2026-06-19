@@ -13,7 +13,7 @@ import androidx.annotation.IntDef
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hippo.ehviewer.EhApplication
-import com.hippo.ehviewer.R
+import com.tianri.ehviewer_fplus.R
 import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhRequest
 import com.hippo.ehviewer.client.EhUrl

@@ -19,10 +19,7 @@ package com.hippo.ehviewer.ui.scene;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.hardware.fingerprint.FingerprintManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.CancellationSignal;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +27,10 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.hippo.ehviewer.R;
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
+import androidx.core.content.ContextCompat;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.ehviewer.ui.SetSecurityActivity;
@@ -59,9 +59,7 @@ public class SecurityScene extends SolidScene implements
     private Sensor mAccelerometer;
     private ShakeDetector mShakeDetector;
     @Nullable
-    private FingerprintManager mFingerprintManager;
-
-    private CancellationSignal mFingerprintCancellationSignal;
+    private BiometricPrompt mBiometricPrompt;
 
     private int mRetryTimes;
 
@@ -84,10 +82,6 @@ public class SecurityScene extends SolidScene implements
                 mShakeDetector.setOnShakeListener(this);
             }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mFingerprintManager = context.getSystemService(FingerprintManager.class);
-        }
-
         if (null == savedInstanceState) {
             mRetryTimes = MAX_RETRY_TIMES;
         } else {
@@ -113,11 +107,11 @@ public class SecurityScene extends SolidScene implements
         }
 
         if (isFingerprintAuthAvailable()) {
-            mFingerprintCancellationSignal = new CancellationSignal();
-            // The line below prevents the false positive inspection from Android Studio
-            // noinspection ResourceType
-            mFingerprintManager.authenticate(null, mFingerprintCancellationSignal, 0,
-                    new FingerprintManager.AuthenticationCallback() {
+            Context context = getEHContext();
+            AssertUtils.assertNotNull(context);
+            mBiometricPrompt = new BiometricPrompt(this,
+                    ContextCompat.getMainExecutor(context),
+                    new BiometricPrompt.AuthenticationCallback() {
                         @Override
                         public void onAuthenticationError(int errMsgId, CharSequence errString) {
                             fingerprintError(true);
@@ -130,7 +124,7 @@ public class SecurityScene extends SolidScene implements
 
                         @Override
                         public void onAuthenticationSucceeded(
-                                FingerprintManager.AuthenticationResult result) {
+                                @NonNull BiometricPrompt.AuthenticationResult result) {
                             mFingerprintIcon.setImageResource(R.drawable.fingerprint_success);
                             mFingerprintIcon.postDelayed(new Runnable() {
                                 @Override
@@ -143,7 +137,13 @@ public class SecurityScene extends SolidScene implements
                             }, SUCCESS_DELAY_MILLIS);
 
                         }
-                    }, null);
+                    });
+            BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                    .setTitle(getString(R.string.enable_fingerprint))
+                    .setNegativeButtonText(getString(R.string.cancel))
+                    .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK)
+                    .build();
+            mBiometricPrompt.authenticate(promptInfo);
         }
     }
 
@@ -154,9 +154,9 @@ public class SecurityScene extends SolidScene implements
         if (null != mShakeDetector) {
             mSensorManager.unregisterListener(mShakeDetector);
         }
-        if (isFingerprintAuthAvailable() && mFingerprintCancellationSignal != null) {
-            mFingerprintCancellationSignal.cancel();
-            mFingerprintCancellationSignal = null;
+        if (mBiometricPrompt != null) {
+            mBiometricPrompt.cancelAuthentication();
+            mBiometricPrompt = null;
         }
     }
 
@@ -239,12 +239,10 @@ public class SecurityScene extends SolidScene implements
     }
 
     private boolean isFingerprintAuthAvailable() {
-        // The line below prevents the false positive inspection from Android Studio
-        // noinspection ResourceType
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+        Context context = getEHContext();
+        return context != null
                 && Settings.getEnableFingerprint()
-                && mFingerprintManager != null
-                && SetSecurityActivity.hasEnrolledFingerprints(mFingerprintManager);
+                && SetSecurityActivity.hasEnrolledBiometrics(context);
     }
 
     private Runnable mResetFingerprintRunnable = new Runnable() {

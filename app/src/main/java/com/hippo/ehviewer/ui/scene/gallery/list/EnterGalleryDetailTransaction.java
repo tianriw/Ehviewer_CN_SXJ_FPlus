@@ -22,7 +22,7 @@ import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.transition.TransitionInflater;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.ui.scene.gallery.detail.GalleryDetailScene;
 import com.hippo.scene.TransitionHelper;
 

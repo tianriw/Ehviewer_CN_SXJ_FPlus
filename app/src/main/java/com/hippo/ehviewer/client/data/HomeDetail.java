@@ -2,7 +2,7 @@ package com.hippo.ehviewer.client.data;
 
 import android.content.Context;
 
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 
 public class HomeDetail {
 

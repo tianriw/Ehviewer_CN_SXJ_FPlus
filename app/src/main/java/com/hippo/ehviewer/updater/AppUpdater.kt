@@ -10,9 +10,9 @@ import com.alibaba.fastjson.JSONException
 import com.alibaba.fastjson.JSONObject
 import com.hippo.ehviewer.Analytics
 import com.hippo.ehviewer.AppConfig
-import com.hippo.ehviewer.BuildConfig
+import com.tianri.ehviewer_fplus.BuildConfig
 import com.hippo.ehviewer.EhApplication
-import com.hippo.ehviewer.R
+import com.tianri.ehviewer_fplus.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.ui.dialog.UpdateDialog
 import com.hippo.lib.yorozuya.FileUtils

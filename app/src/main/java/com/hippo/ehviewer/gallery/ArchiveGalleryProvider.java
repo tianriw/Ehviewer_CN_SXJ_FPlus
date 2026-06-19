@@ -24,7 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.hippo.a7zip.ArchiveException;
 import com.hippo.ehviewer.GetText;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.lib.glgallery.GalleryPageView;
 import com.hippo.lib.image.Image;
 //import com.hippo.lib.image.Image1;

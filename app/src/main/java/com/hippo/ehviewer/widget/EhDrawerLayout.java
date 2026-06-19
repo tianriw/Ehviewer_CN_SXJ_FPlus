@@ -26,7 +26,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.ViewCompat;
 import com.google.android.material.snackbar.Snackbar;
 import com.hippo.drawerlayout.DrawerLayout;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.lib.yorozuya.AnimationUtils;
 import java.util.ArrayList;
 import java.util.List;

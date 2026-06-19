@@ -9,9 +9,9 @@ if (file('google-services.json').exists()) {
 }
 
 android {
-    namespace 'com.hippo.ehviewer'
-    testNamespace 'com.hippo.ehviewer.debug'
-    compileSdk 35
+    namespace 'com.tianri.ehviewer_fplus'
+    testNamespace 'com.tianri.ehviewer_fplus.debug'
+    compileSdk 37
 //    buildToolsVersion "30.0.3"
 //    ndkVersion '26.1.10909125'
 
@@ -26,7 +26,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.xjs.ehviewer"
+        applicationId "com.tianri.ehviewer_fplus"
         minSdkVersion 23
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 30
@@ -58,11 +58,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField 'String', 'FILE_PROVIDER_AUTHORITY', '"com.hippo.ehviewer.fileprovider"'
+            buildConfigField 'String', 'FILE_PROVIDER_AUTHORITY', '"com.tianri.ehviewer_fplus.fileprovider"'
         }
         debug {
             applicationIdSuffix ".debug"
-            buildConfigField 'String', 'FILE_PROVIDER_AUTHORITY', '"com.hippo.ehviewer.debug.fileprovider"'
+            buildConfigField 'String', 'FILE_PROVIDER_AUTHORITY', '"com.tianri.ehviewer_fplus.debug.fileprovider"'
         }
     }
 

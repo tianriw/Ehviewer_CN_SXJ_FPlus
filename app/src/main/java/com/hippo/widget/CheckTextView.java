@@ -32,7 +32,7 @@ import android.view.View.OnClickListener;
 import android.view.animation.Interpolator;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatTextView;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.hotspot.Hotspot;
 import com.hippo.hotspot.Hotspotable;
 import com.hippo.lib.yorozuya.AnimationUtils;

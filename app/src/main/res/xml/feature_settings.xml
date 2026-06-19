@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.hippo.preference.ListPreference
+        android:defaultValue="3"
+        android:key="download_retry_count"
+        android:summary="%s"
+        android:title="@string/settings_download_retry_count"
+        app:entries="@array/download_retry_count_entries"
+        app:entryValues="@array/download_retry_count_values" />
+
+    <com.hippo.preference.SwitchPreference
+        android:defaultValue="false"
+        android:key="cache_as_download"
+        android:summary="@string/settings_read_cache_as_download_summary"
+        android:title="@string/settings_read_cache_as_download" />
+
+    <com.hippo.preference.SwitchPreference
+        android:defaultValue="false"
+        android:key="auto_sync_cloud_favorites"
+        android:summary="@string/settings_auto_sync_cloud_favorites_summary"
+        android:title="@string/settings_auto_sync_cloud_favorites" />
+
+    <com.hippo.preference.SwitchPreference
+        android:defaultValue="false"
+        android:key="tracking_enabled"
+        android:summary="@string/settings_tracking_enabled_summary"
+        android:title="@string/settings_tracking_enabled"
+        app:allowDividerAbove="true" />
+
+    <com.hippo.preference.ListPreference
+        android:defaultValue="6"
+        android:key="tracking_interval_hours"
+        android:summary="%s"
+        android:title="@string/settings_tracking_interval"
+        app:entries="@array/tracking_interval_entries"
+        app:entryValues="@array/tracking_interval_values" />
+
+    <com.hippo.preference.ListPreference
+        android:defaultValue="50"
+        android:key="tracking_per_tag_limit"
+        android:summary="%s"
+        android:title="@string/settings_tracking_per_tag_limit"
+        app:entries="@array/tracking_per_tag_limit_entries"
+        app:entryValues="@array/tracking_per_tag_limit_values" />
+
+    <com.hippo.preference.ListPreference
+        android:defaultValue="200"
+        android:key="tracking_global_limit"
+        android:summary="%s"
+        android:title="@string/settings_tracking_global_limit"
+        app:entries="@array/tracking_global_limit_entries"
+        app:entryValues="@array/tracking_global_limit_values" />
+
+    <com.hippo.preference.SwitchPreference
+        android:defaultValue="true"
+        android:key="reading_statistics_enabled"
+        android:summary="@string/settings_reading_statistics_summary"
+        android:title="@string/settings_reading_statistics"
+        app:allowDividerAbove="true" />
+
+    <com.hippo.preference.SwitchPreference
+        android:defaultValue="false"
+        android:key="live_mode"
+        android:summary="@string/settings_live_mode_summary"
+        android:title="@string/live_mode"
+        app:allowDividerAbove="true" />
+
+</PreferenceScreen>

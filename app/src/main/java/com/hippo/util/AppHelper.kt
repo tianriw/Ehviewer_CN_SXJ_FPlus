@@ -28,7 +28,7 @@ import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import com.hippo.ehviewer.R
+import com.tianri.ehviewer_fplus.R
 import java.lang.RuntimeException
 
 class AppHelper {

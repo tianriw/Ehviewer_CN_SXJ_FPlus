@@ -22,7 +22,7 @@ import android.content.pm.PackageManager;
 import androidx.preference.Preference;
 import android.util.AttributeSet;
 
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 
 public class VersionPreference extends Preference {
 

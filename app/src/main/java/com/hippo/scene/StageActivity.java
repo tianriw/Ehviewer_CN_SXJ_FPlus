@@ -28,7 +28,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.ui.EhActivity;
 import com.hippo.lib.yorozuya.AssertUtils;
 import com.hippo.lib.yorozuya.IntIdGenerator;

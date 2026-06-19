@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.hippo.ehviewer.EhApplication
-import com.hippo.ehviewer.R
+import com.tianri.ehviewer_fplus.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.UrlOpener
 import com.hippo.ehviewer.client.EhClient
@@ -19,6 +19,7 @@ import com.hippo.ehviewer.client.EhUrl
 import com.hippo.ehviewer.client.data.userTag.TagPushParam
 import com.hippo.ehviewer.client.data.userTag.UserTagList
 import com.hippo.ehviewer.dao.Filter
+import com.hippo.ehviewer.sync.TrackingManager
 import com.hippo.ehviewer.ui.MainActivity
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.ehviewer.ui.scene.EhCallback
@@ -59,6 +60,8 @@ class GalleryListSceneDialog(val baseScene: BaseScene) {
                     )
 
                     1 -> showFilterTagDialog()
+
+                    2 -> trackTag()
                 }
             }
         if (!Settings.isLogin()) {
@@ -97,6 +100,31 @@ class GalleryListSceneDialog(val baseScene: BaseScene) {
                 EhFilter.getInstance().addFilter(filter)
                 showTip(R.string.filter_added, BaseScene.LENGTH_SHORT)
             }.show()
+    }
+
+    private fun trackTag() {
+        val tag = tagName?.trim().orEmpty()
+        if (tag.isEmpty() || context == null) {
+            return
+        }
+        val existing = TrackingManager.findTag(tag)
+        if (existing?.enabled == true) {
+            Toast.makeText(
+                context, context.getString(R.string.tracking_tag_already_added, tag),
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        if (existing == null) {
+            TrackingManager.addLocalTag(tag)
+        } else {
+            TrackingManager.setTagEnabled(existing.name, true)
+        }
+        Settings.putTrackingEnabled(true)
+        TrackingManager.check(context, true, null)
+        Toast.makeText(
+            context, context.getString(R.string.tracking_tag_added, tag), Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun showTip(@StringRes id: Int, length: Int) {

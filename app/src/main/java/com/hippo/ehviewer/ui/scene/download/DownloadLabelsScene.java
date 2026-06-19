@@ -41,7 +41,7 @@ import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemView
 import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.dao.DownloadLabel;
 import com.hippo.ehviewer.ui.scene.ToolbarScene;
 import com.hippo.util.DrawableManager;

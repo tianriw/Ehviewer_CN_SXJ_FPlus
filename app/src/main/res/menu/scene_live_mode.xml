@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_exit_live_mode"
+        android:icon="@drawable/ic_baseline_visibility_off_24"
+        android:title="@string/live_mode_exit"
+        app:showAsAction="always" />
+</menu>

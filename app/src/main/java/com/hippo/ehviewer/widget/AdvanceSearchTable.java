@@ -26,7 +26,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.lib.yorozuya.NumberUtils;
 
 public class AdvanceSearchTable extends LinearLayout {

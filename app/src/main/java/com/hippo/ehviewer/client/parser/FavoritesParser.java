@@ -19,7 +19,7 @@ package com.hippo.ehviewer.client.parser;
 import static com.hippo.ehviewer.client.data.ListUrlBuilder.MODE_NORMAL;
 
 import com.hippo.ehviewer.GetText;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.client.exception.EhException;
 import com.hippo.ehviewer.client.exception.ParseException;

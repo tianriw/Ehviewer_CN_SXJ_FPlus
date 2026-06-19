@@ -38,6 +38,7 @@ public class DownloadInfo extends GalleryInfo {
 	public static final int STATE_FAILED = 4;
 	public static final int STATE_UPDATE = 5;
 	public static final int GOTO_NEW = 6;
+	public static final int STATE_PARTIAL = 7;
 	public long speed;
 	public long remaining;
 	public int finished;
@@ -262,7 +263,8 @@ public class DownloadInfo extends GalleryInfo {
 	}
 
 	public static DownloadInfo downloadInfoFromJson(JSONObject object) throws ClassCastException {
-		DownloadInfo downloadInfo = (DownloadInfo) GalleryInfo.galleryInfoFromJson(object);
+		GalleryInfo base = GalleryInfo.galleryInfoFromJson(object);
+		DownloadInfo downloadInfo = new DownloadInfo(base);
 		downloadInfo.finished = object.getIntValue("finished");
 		downloadInfo.legacy = object.getIntValue("legacy");
 		downloadInfo.label = object.getString("label");

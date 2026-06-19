@@ -27,7 +27,7 @@ import androidx.preference.PreferenceViewHolder;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.preference.ActivityPreference;

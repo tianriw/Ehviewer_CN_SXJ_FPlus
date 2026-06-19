@@ -28,7 +28,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.hippo.content.FileProvider;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.callBack.ImageChangeCallBack;
 import com.hippo.ehviewer.callBack.PermissionCallBack;

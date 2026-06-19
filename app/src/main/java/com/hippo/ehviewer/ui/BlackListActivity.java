@@ -38,7 +38,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.ehviewer.EhDB;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.dao.BlackList;
 import com.hippo.util.DrawableManager;
 import com.hippo.util.TimeUtils;

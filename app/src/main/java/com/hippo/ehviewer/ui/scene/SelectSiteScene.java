@@ -23,7 +23,7 @@ import android.view.ViewGroup;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.ehviewer.ui.MainActivity;

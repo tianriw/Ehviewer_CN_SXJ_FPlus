@@ -36,7 +36,7 @@ import androidx.core.app.ActivityCompat;
 import com.alibaba.fastjson.JSONArray;
 import com.hippo.ehviewer.Analytics;
 import com.hippo.ehviewer.EhDB;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.client.data.wifi.WiFiDataHand;
 import com.hippo.ehviewer.client.wifi.ConnectThread;

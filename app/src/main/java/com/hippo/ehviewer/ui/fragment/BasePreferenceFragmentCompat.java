@@ -7,7 +7,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceGroup;
 import androidx.preference.PreferenceScreen;
 
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.ui.SettingsActivity;
 
 import java.util.ArrayList;

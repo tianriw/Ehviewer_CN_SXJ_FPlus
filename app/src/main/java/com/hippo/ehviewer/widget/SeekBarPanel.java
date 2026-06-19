@@ -23,7 +23,7 @@ import android.view.MotionEvent;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import androidx.annotation.NonNull;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.lib.yorozuya.ViewUtils;
 
 public class SeekBarPanel extends LinearLayout {

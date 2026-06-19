@@ -29,7 +29,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.ui.fragment.SettingsHeaders;
 import com.hippo.util.DrawableManager;

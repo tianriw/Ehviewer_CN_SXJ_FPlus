@@ -23,7 +23,7 @@ import android.util.AttributeSet;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.client.EhCookieStore;
 import com.hippo.ehviewer.client.EhUrl;
 import com.hippo.preference.MessagePreference;

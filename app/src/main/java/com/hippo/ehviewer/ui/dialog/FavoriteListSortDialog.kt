@@ -2,7 +2,7 @@ package com.hippo.ehviewer.ui.dialog
 
 import android.app.AlertDialog
 import android.content.DialogInterface
-import com.hippo.ehviewer.R
+import com.tianri.ehviewer_fplus.R
 import com.hippo.ehviewer.client.EhConfig
 import com.hippo.ehviewer.client.parser.FavoritesParser
 import com.hippo.ehviewer.ui.scene.gallery.list.FavoritesScene

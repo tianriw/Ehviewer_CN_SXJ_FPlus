@@ -12,7 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.github.ybq.android.spinkit.SpinKitView
 import com.hippo.ehviewer.EhApplication
-import com.hippo.ehviewer.R
+import com.tianri.ehviewer_fplus.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhRequest

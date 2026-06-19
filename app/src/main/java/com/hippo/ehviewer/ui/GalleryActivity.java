@@ -66,8 +66,11 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.hippo.android.resource.AttrResources;
+import com.hippo.app.EditTextDialogBuilder;
 import com.hippo.ehviewer.AppConfig;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
+import com.hippo.ehviewer.EhApplication;
+import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.event.GalleryActivityEvent;
@@ -78,6 +81,7 @@ import com.hippo.ehviewer.gallery.GalleryProvider2;
 import com.hippo.ehviewer.widget.GalleryGuideView;
 import com.hippo.ehviewer.widget.GalleryHeader;
 import com.hippo.ehviewer.widget.ReversibleSeekBar;
+import com.hippo.ehviewer.widget.BookmarkMarkerView;
 import com.hippo.lib.glgallery.GalleryProvider;
 import com.hippo.lib.glgallery.GalleryView;
 import com.hippo.lib.glgallery.SimpleAdapter;
@@ -104,6 +108,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -124,6 +130,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     public static final String DATA_IN_EVENT = "data_in_event";
     public static final String KEY_PAGE = "page";
     public static final String KEY_CURRENT_INDEX = "current_index";
+    private static final String KEY_READING_RECORDED = "reading_recorded";
 
     private static final long SLIDER_ANIMATION_DURING = 150;
     private static final long HIDE_SLIDER_DELAY = 3000;
@@ -168,6 +175,11 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     private TextView mRightText;
     @Nullable
     private ReversibleSeekBar mSeekBar;
+    @Nullable
+    private BookmarkMarkerView mBookmarkMarkerView;
+
+    // Cached bookmarked page indices for the current gallery (for slider markers).
+    private final List<Integer> mBookmarkedPages = new ArrayList<>();
 
     private ObjectAnimator mSeekBarPanelAnimator;
     private ObjectAnimator mAutoTransferAnimator;
@@ -175,6 +187,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     private int mLayoutMode;
     private int mSize;
     private int mCurrentIndex;
+    private boolean mReadingRecorded;
 
     private boolean canFinish = false;
     private boolean autoTransferring = false;
@@ -252,7 +265,8 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
             }
         } else if (ACTION_EH.equals(mAction)) {
             if (mGalleryInfo != null) {
-                mGalleryProvider = new EhGalleryProvider(this, mGalleryInfo);
+                mGalleryProvider = new EhGalleryProvider(
+                        this, mGalleryInfo, mReadingRecorded, () -> mReadingRecorded = true);
             }
         } else if (Intent.ACTION_VIEW.equals(mAction)) {
             if (mUri != null) {
@@ -304,6 +318,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         mGalleryInfo = savedInstanceState.getParcelable(KEY_GALLERY_INFO);
         mPage = savedInstanceState.getInt(KEY_PAGE, -1);
         mCurrentIndex = savedInstanceState.getInt(KEY_CURRENT_INDEX);
+        mReadingRecorded = savedInstanceState.getBoolean(KEY_READING_RECORDED);
         buildProvider();
     }
 
@@ -318,6 +333,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         }
         outState.putInt(KEY_PAGE, mPage);
         outState.putInt(KEY_CURRENT_INDEX, mCurrentIndex);
+        outState.putBoolean(KEY_READING_RECORDED, mReadingRecorded);
     }
 
     @Override
@@ -401,10 +417,12 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         mRightText = (TextView) ViewUtils.$$(mSeekBarPanel, R.id.right);
         mSeekBar = (ReversibleSeekBar) ViewUtils.$$(mSeekBarPanel, R.id.seek_bar);
         mSeekBar.setOnSeekBarChangeListener(this);
+        mBookmarkMarkerView = (BookmarkMarkerView) ViewUtils.$$(mSeekBarPanel, R.id.bookmark_marker);
         mAutoTransferPanel.setOnClickListener(this::autoRead);
 
         mSize = mGalleryProvider.size();
         mCurrentIndex = startPage;
+        refreshBookmarkMarkers();
         if (mGalleryView != null) {
             mLayoutMode = mGalleryView.getLayoutMode();
         }
@@ -746,6 +764,10 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         end.setText(Integer.toString(mSize));
         mSeekBar.setMax(mSize - 1);
         mSeekBar.setProgress(mCurrentIndex);
+        if (mBookmarkMarkerView != null) {
+            mBookmarkMarkerView.setBookmarks(mBookmarkedPages, mSize,
+                    mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT);
+        }
     }
 
     @Override
@@ -780,6 +802,7 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
     public void onUpdateCurrentIndex(int index) {
         if (null != mGalleryProvider) {
             mGalleryProvider.putStartPage(index);
+            mGalleryProvider.markPageViewed(index);
         }
 
         NotifyTask task = mNotifyTaskPool.pop();
@@ -1109,7 +1132,18 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
         builder.setTitle(resources.getString(R.string.page_menu_title, page + 1));
 
         final CharSequence[] items;
-        items = new CharSequence[]{getString(R.string.page_menu_refresh), getString(R.string.page_menu_share), getString(R.string.page_menu_save), getString(R.string.page_menu_save_to)};
+        if (mGalleryInfo != null) {
+            boolean bookmarked = mBookmarkedPages.contains(page);
+            items = new CharSequence[]{getString(R.string.page_menu_refresh),
+                    getString(R.string.page_menu_share), getString(R.string.page_menu_save),
+                    getString(R.string.page_menu_save_to),
+                    getString(bookmarked ? R.string.page_menu_bookmark_manage
+                            : R.string.page_menu_add_bookmark)};
+        } else {
+            items = new CharSequence[]{getString(R.string.page_menu_refresh),
+                    getString(R.string.page_menu_share), getString(R.string.page_menu_save),
+                    getString(R.string.page_menu_save_to)};
+        }
         pageDialogListener(builder, items, page);
         builder.show();
     }
@@ -1134,7 +1168,91 @@ public class GalleryActivity extends EhActivity implements SeekBar.OnSeekBarChan
                 case 3: // Save to
                     saveImageTo(page);
                     break;
+                case 4: // Bookmark
+                    onPageBookmark(page);
+                    break;
             }
+        });
+    }
+
+    private void onPageBookmark(int page) {
+        if (mGalleryInfo == null) {
+            return;
+        }
+        long gid = mGalleryInfo.gid;
+        if (mBookmarkedPages.contains(page)) {
+            // Already bookmarked: offer remove / edit note.
+            EhDB.PageBookmark existing = null;
+            for (EhDB.PageBookmark b : EhDB.getBookmarks(gid)) {
+                if (b.page == page) {
+                    existing = b;
+                    break;
+                }
+            }
+            final EhDB.PageBookmark bookmark = existing;
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.page_menu_title, page + 1))
+                    .setItems(new CharSequence[]{getString(R.string.bookmark_edit_note),
+                            getString(R.string.bookmark_remove)}, (d, which) -> {
+                        if (which == 0) {
+                            showBookmarkNoteEditor(page, bookmark);
+                        } else if (which == 1) {
+                            EhDB.removeBookmark(gid, page);
+                            refreshBookmarkMarkers();
+                            Toast.makeText(this, R.string.bookmark_removed, Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+        } else {
+            showBookmarkNoteEditor(page, null);
+        }
+    }
+
+    private void showBookmarkNoteEditor(int page, @Nullable EhDB.PageBookmark existing) {
+        if (mGalleryInfo == null) {
+            return;
+        }
+        EditTextDialogBuilder builder = new EditTextDialogBuilder(this,
+                existing == null ? null : existing.note, getString(R.string.bookmark_note_hint));
+        builder.setTitle(getString(R.string.page_menu_title, page + 1));
+        final long gid = mGalleryInfo.gid;
+        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            String note = builder.getText().trim();
+            if (note.isEmpty()) {
+                note = null;
+            }
+            if (existing == null) {
+                EhDB.addBookmark(mGalleryInfo, page, note);
+                Toast.makeText(this, R.string.bookmark_added, Toast.LENGTH_SHORT).show();
+            } else {
+                EhDB.updateBookmarkNote(existing.id, note);
+            }
+            refreshBookmarkMarkers();
+        });
+        builder.setNegativeButton(android.R.string.cancel, null);
+        builder.show();
+    }
+
+    private void refreshBookmarkMarkers() {
+        if (mGalleryInfo == null) {
+            return;
+        }
+        final long gid = mGalleryInfo.gid;
+        EhApplication.getExecutorService(this).execute(() -> {
+            List<EhDB.PageBookmark> bookmarks = EhDB.getBookmarks(gid);
+            List<Integer> pages = new ArrayList<>();
+            for (EhDB.PageBookmark b : bookmarks) {
+                pages.add(b.page);
+            }
+            SimpleHandler.getInstance().post(() -> {
+                mBookmarkedPages.clear();
+                mBookmarkedPages.addAll(pages);
+                if (mBookmarkMarkerView != null) {
+                    mBookmarkMarkerView.setBookmarks(mBookmarkedPages, mSize,
+                            mLayoutMode == GalleryView.LAYOUT_RIGHT_TO_LEFT);
+                }
+            });
         });
     }
 

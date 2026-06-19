@@ -39,7 +39,7 @@ import com.hippo.easyrecyclerview.FastScroller;
 import com.hippo.easyrecyclerview.HandlerDrawable;
 import com.hippo.easyrecyclerview.LayoutManagerUtils;
 import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.client.parser.FavoritesParser;
 import com.hippo.ehviewer.client.parser.GalleryListParser;
 import com.hippo.refreshlayout.RefreshLayout;

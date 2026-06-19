@@ -290,6 +290,7 @@
     </string-array>
 
     <string-array name="read_cache_size_entries" translatable="false">
+        <item>@string/download_timeout_unlimited</item>
         <item>40 MB</item>
         <item>80 MB</item>
         <item>160 MB</item>
@@ -298,11 +299,70 @@
     </string-array>
 
     <string-array name="read_cache_size_entry_values" translatable="false">
+        <item>-1</item>
         <item>40</item>
         <item>80</item>
         <item>160</item>
         <item>320</item>
         <item>640</item>
+    </string-array>
+
+    <string-array name="download_retry_count_entries" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+        <item>10</item>
+    </string-array>
+
+    <string-array name="download_retry_count_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+        <item>10</item>
+    </string-array>
+
+    <string-array name="tracking_interval_entries" translatable="false">
+        <item>1 h</item>
+        <item>3 h</item>
+        <item>6 h</item>
+        <item>12 h</item>
+        <item>24 h</item>
+    </string-array>
+
+    <string-array name="tracking_interval_values" translatable="false">
+        <item>1</item>
+        <item>3</item>
+        <item>6</item>
+        <item>12</item>
+        <item>24</item>
+    </string-array>
+
+    <string-array name="tracking_per_tag_limit_entries" translatable="false">
+        <item>20</item>
+        <item>50</item>
+        <item>100</item>
+    </string-array>
+
+    <string-array name="tracking_per_tag_limit_values" translatable="false">
+        <item>20</item>
+        <item>50</item>
+        <item>100</item>
+    </string-array>
+
+    <string-array name="tracking_global_limit_entries" translatable="false">
+        <item>50</item>
+        <item>100</item>
+        <item>200</item>
+        <item>500</item>
+    </string-array>
+
+    <string-array name="tracking_global_limit_values" translatable="false">
+        <item>50</item>
+        <item>100</item>
+        <item>200</item>
+        <item>500</item>
     </string-array>
 
     <string-array name="gallery_list_menu_entries">
@@ -324,6 +384,7 @@
     <string-array name="tag_menu_entries">
         <item>@string/show_definition</item>
         <item>@string/add_filter</item>
+        <item>@string/tracking</item>
     </string-array>
 
     <string-array name="app_language_entries">

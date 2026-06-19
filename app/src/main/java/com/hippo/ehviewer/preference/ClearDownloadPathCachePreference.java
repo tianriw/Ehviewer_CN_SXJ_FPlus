@@ -20,7 +20,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import androidx.appcompat.app.AlertDialog;
 import com.hippo.ehviewer.EhDB;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.preference.MessagePreference;
 
 public class ClearDownloadPathCachePreference extends MessagePreference {

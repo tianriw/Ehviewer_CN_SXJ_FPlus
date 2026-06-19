@@ -25,7 +25,7 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 
 public class DividerView extends View {
 

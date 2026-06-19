@@ -35,7 +35,7 @@ import com.hippo.beerbelly.SimpleDiskCache;
 import com.hippo.ehviewer.Analytics;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.GetText;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhEngine;
 import com.hippo.ehviewer.client.EhRequestBuilder;
@@ -77,6 +77,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -165,6 +166,7 @@ public final class SpiderQueen implements Runnable {
     private final AtomicReference<String> showKey = new AtomicReference<>();
 
     private final int downloadTimeout;
+    private final int mRetryCount;
 
     private long receiveBytesBefore;
 
@@ -187,6 +189,7 @@ public final class SpiderQueen implements Runnable {
                 new PriorityThreadFactory(SpiderWorker.class.getSimpleName(), Process.THREAD_PRIORITY_BACKGROUND));
         mDownloadDelay = Settings.getDownloadDelay();
         downloadTimeout = Settings.getDownloadTimeout();
+        mRetryCount = MathUtils.clamp(Settings.getDownloadRetryCount(), 0, 10);
     }
 
     @UiThread
@@ -734,6 +737,32 @@ public final class SpiderQueen implements Runnable {
         }
     }
 
+    public boolean promoteReadPage(int index) {
+        return getPageState(index) == STATE_FINISHED && mSpiderDen.promoteToDownload(index);
+    }
+
+    public boolean isPageFinished(int index) {
+        return getPageState(index) == STATE_FINISHED;
+    }
+
+    public int getDownloadedPageCount() {
+        return mSpiderDen.getDownloadedPageCount();
+    }
+
+    private boolean shouldRetryPage(String error) {
+        if (TextUtils.isEmpty(error)) {
+            return true;
+        }
+        String value = error.toLowerCase(Locale.US);
+        return !value.contains("509")
+                && !value.contains("gp")
+                && !value.contains("ptoken")
+                && !value.contains("write")
+                && !value.contains("reading")
+                && !value.contains("hijack")
+                && !value.contains("interrupted");
+    }
+
     private synchronized SpiderInfo readSpiderInfoFromLocal() {
         SpiderInfo spiderInfo = mSpiderInfo.get();
         if (spiderInfo != null) {
@@ -1045,9 +1074,10 @@ public final class SpiderQueen implements Runnable {
             }
 
             // Clear
-            if (state == STATE_DOWNLOADING) {
+            if (state == STATE_DOWNLOADING || state == STATE_FINISHED) {
                 mPageErrorMap.remove(index);
-            } else if (state == STATE_FINISHED || state == STATE_FAILED) {
+            }
+            if (state == STATE_FINISHED || state == STATE_FAILED) {
                 mPagePercentMap.remove(index);
             }
 
@@ -1523,10 +1553,10 @@ public final class SpiderQueen implements Runnable {
                 }
             }
 
-            // Remove download failed image
+            // Keep transient failures internal. The caller decides whether the retry budget
+            // is exhausted before exposing a failed state to listeners.
             mSpiderDen.remove(index);
-
-            updatePageState(index, STATE_FAILED, error);
+            mPageErrorMap.put(index, error);
             return !interrupt;
         }
 
@@ -1666,13 +1696,60 @@ public final class SpiderQueen implements Runnable {
             }
 
             if (SpiderInfo.TOKEN_FAILED.equals(pToken)) {
-                // Get token failed
-                updatePageState(index, STATE_FAILED, GetText.getString(R.string.error_get_ptoken_error));
-                return true;
+                String error = GetText.getString(R.string.error_get_ptoken_error);
+                for (int attempt = 0; attempt < mRetryCount; attempt++) {
+                    synchronized (mPTokenLock) {
+                        spiderInfo.pTokenMap.remove(index);
+                    }
+                    pToken = getPTokenFromInternet(index);
+                    if (!TextUtils.isEmpty(pToken)) {
+                        synchronized (mPTokenLock) {
+                            spiderInfo.pTokenMap.put(index, pToken);
+                        }
+                        break;
+                    }
+                    try {
+                        Thread.sleep(Math.min(8000L, 1000L << attempt));
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return false;
+                    }
+                }
+                if (TextUtils.isEmpty(pToken) || SpiderInfo.TOKEN_FAILED.equals(pToken)) {
+                    updatePageState(index, STATE_FAILED, error);
+                    return true;
+                }
             }
 
-            // Get image url
-            return downloadImage(mGid, index, pToken, previousPToken, force);
+            // Get image url. A manual force request receives a fresh retry budget.
+            for (int attempt = 0; attempt <= mRetryCount; attempt++) {
+                boolean keepWorker = downloadImage(mGid, index, pToken, previousPToken, force);
+                if (!keepWorker) {
+                    // Interrupted: mark page failed so it doesn't stay in STATE_DOWNLOADING.
+                    String interruptError = mPageErrorMap.get(index);
+                    updatePageState(index, STATE_FAILED,
+                            interruptError != null ? interruptError : "Interrupted");
+                    return false;
+                }
+                if (getPageState(index) == STATE_FINISHED) {
+                    return true;
+                }
+                String error = mPageErrorMap.get(index);
+                if (attempt >= mRetryCount || !shouldRetryPage(error)) {
+                    updatePageState(index, STATE_FAILED, error);
+                    return true;
+                }
+                Log.i(TAG, "Retry page " + index + " after failure, attempt "
+                        + (attempt + 1) + "/" + mRetryCount + ": " + error);
+                try {
+                    Thread.sleep(Math.min(8000L, 1000L << attempt));
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    updatePageState(index, STATE_FAILED, mPageErrorMap.get(index));
+                    return false;
+                }
+            }
+            return true;
         }
 
         private void cancelTimeCount() {

@@ -37,7 +37,7 @@ import android.widget.PopupWindow;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.graphics.drawable.DrawableCompat;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.lib.yorozuya.AnimationUtils;
 import com.hippo.lib.yorozuya.LayoutUtils;
 import com.hippo.lib.yorozuya.MathUtils;

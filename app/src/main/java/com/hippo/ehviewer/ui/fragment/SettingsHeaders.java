@@ -11,7 +11,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.ui.SettingsActivity;
 
 public class SettingsHeaders extends PreferenceFragmentCompat{

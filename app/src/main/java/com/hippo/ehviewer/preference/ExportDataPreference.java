@@ -23,7 +23,7 @@ import androidx.annotation.NonNull;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.EhDB;
 import com.hippo.ehviewer.GetText;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.util.ReadableTime;
 import java.io.File;
 

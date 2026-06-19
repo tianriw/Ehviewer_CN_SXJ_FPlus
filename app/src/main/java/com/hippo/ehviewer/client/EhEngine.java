@@ -27,7 +27,7 @@ import androidx.annotation.Nullable;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.GetText;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.data.ArchiverData;
 import com.hippo.ehviewer.client.data.EhNewsDetail;

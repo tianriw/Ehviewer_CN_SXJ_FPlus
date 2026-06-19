@@ -22,7 +22,7 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.widget.LoadImageView;
 
 public class FixedThumb extends LoadImageView {

@@ -44,6 +44,7 @@ public class FavListUrlBuilder implements Parcelable {
 
     public static final int FAV_CAT_ALL = -1;
     public static final int FAV_CAT_LOCAL = -2;
+    public static final int FAV_CAT_LOCAL_CLOUD_BASE = -100;
 
     private int mIndex;
     private String mKeyword;
@@ -74,7 +75,20 @@ public class FavListUrlBuilder implements Parcelable {
     }
 
     public boolean isLocalFavCat() {
-        return mFavCat == FAV_CAT_LOCAL;
+        return mFavCat == FAV_CAT_LOCAL || isLocalCloudFavCat(mFavCat);
+    }
+
+    public static boolean isLocalCloudFavCat(int favCat) {
+        return favCat <= FAV_CAT_LOCAL_CLOUD_BASE
+                && favCat > FAV_CAT_LOCAL_CLOUD_BASE - 10;
+    }
+
+    public static int getLocalCloudSlot(int favCat) {
+        return FAV_CAT_LOCAL_CLOUD_BASE - favCat;
+    }
+
+    public static int getLocalCloudFavCat(int slot) {
+        return FAV_CAT_LOCAL_CLOUD_BASE - slot;
     }
 
 

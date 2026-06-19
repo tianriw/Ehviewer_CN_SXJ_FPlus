@@ -24,7 +24,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import androidx.appcompat.content.res.AppCompatResources;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 
 public class SelectItemWithIconAdapter extends BaseAdapter {
 

@@ -21,7 +21,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.CheckBox;
 import androidx.appcompat.app.AlertDialog;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.preference.DialogPreference;
 import com.hippo.lib.yorozuya.NumberUtils;

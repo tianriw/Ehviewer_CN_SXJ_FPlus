@@ -39,7 +39,7 @@ import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropM
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.ehviewer.EhDB;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.dao.QuickSearch;
 import com.hippo.ehviewer.ui.scene.ToolbarScene;
 import com.hippo.util.DrawableManager;

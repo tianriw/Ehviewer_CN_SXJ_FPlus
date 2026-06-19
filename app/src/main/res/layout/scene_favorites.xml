@@ -35,7 +35,7 @@
         android:layout_marginTop="@dimen/gallery_search_bar_margin_v"
         android:layout_marginRight="@dimen/gallery_search_bar_margin_h" />
 
-    <com.hippo.widget.FabLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    <com.hippo.widget.FabLayout
         android:id="@+id/fab_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

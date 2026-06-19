@@ -19,6 +19,12 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_live_mode"
+            android:title="@string/live_mode"
+            android:icon="@drawable/v_play_dark_x24"
+            android:visible="false"/>
+
+        <item
             android:id="@+id/nav_homepage"
             android:title="@string/homepage"
             android:icon="@drawable/v_homepage_black_x24"/>
@@ -27,6 +33,11 @@
             android:id="@+id/nav_subscription"
             android:title="@string/subscription"
             android:icon="@drawable/v_eh_subscription_black_x24"/>
+
+        <item
+            android:id="@+id/nav_tracking"
+            android:title="@string/tracking"
+            android:icon="@drawable/v_check_dark_x24"/>
 
         <item
             android:id="@+id/nav_whats_hot"
@@ -49,6 +60,16 @@
             android:icon="@drawable/v_history_black_x24"/>
 
         <item
+            android:id="@+id/nav_bookmarks"
+            android:title="@string/bookmarks"
+            android:icon="@drawable/ic_baseline_bookmarks_24"/>
+
+        <item
+            android:id="@+id/nav_statistics"
+            android:title="@string/statistics"
+            android:icon="@drawable/v_history_black_x24"/>
+
+        <item
             android:id="@+id/nav_downloads"
             android:title="@string/downloads"
             android:icon="@drawable/v_download_black_x24"/>
@@ -63,14 +84,6 @@
             android:id="@+id/nav_settings"
             android:title="@string/settings"
             android:icon="@drawable/v_settings_black_x24"/>
-
-        <item
-            android:id="@+id/nav_stub"
-            android:title="@string/stub"
-            android:visible="false"/>
-        <item
-            android:title="@string/stub"
-            android:visible="false"/>
 
     </group>
 

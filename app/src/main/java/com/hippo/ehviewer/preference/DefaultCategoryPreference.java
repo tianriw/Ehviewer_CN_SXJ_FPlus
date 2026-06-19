@@ -20,7 +20,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.widget.CategoryTable;
 import com.hippo.preference.DialogPreference;

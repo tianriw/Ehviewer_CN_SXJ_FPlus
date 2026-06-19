@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_statistics_previous_year"
+        android:icon="@drawable/v_arrow_left_dark_x24"
+        android:title="@string/previous_year"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_statistics_next_year"
+        android:icon="@drawable/v_arrow_right_dark_x24"
+        android:title="@string/next_year"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_statistics_clear"
+        android:icon="@drawable/v_clear_all_dark_x24"
+        android:title="@string/clear_statistics"
+        app:showAsAction="ifRoom" />
+</menu>

@@ -37,7 +37,7 @@ import android.util.Log
 import androidx.annotation.IntDef
 import androidx.core.app.NotificationCompat
 import com.hippo.ehviewer.EhApplication
-import com.hippo.ehviewer.R
+import com.tianri.ehviewer_fplus.R
 import com.hippo.ehviewer.client.EhUtils
 import com.hippo.ehviewer.client.data.GalleryInfo
 import com.hippo.ehviewer.dao.DownloadInfo

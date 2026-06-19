@@ -362,7 +362,7 @@ public class GalleryInfo implements Parcelable {
         galleryInfo.pages = object.getIntValue("pages");
         galleryInfo.rated = object.getBoolean("rated");
         galleryInfo.rating = object.getFloat("rating");
-        galleryInfo.simpleLanguage = object.getString("");
+        galleryInfo.simpleLanguage = object.getString("simpleLanguage");
         JSONArray simpleTagsArr = object.getJSONArray("simpleTags");
         if (simpleTagsArr != null) {
             try {

@@ -7,7 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.preference.Preference;
 
 import com.hippo.ehviewer.Analytics;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 
 /**
@@ -22,7 +22,6 @@ public class PrivacyFragment extends BasePreferenceFragmentCompat
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
         addPreferencesFromResource(R.xml.privacy_settings);
         Preference enableAnalytics = findPreference(Settings.KEY_ENABLE_ANALYTICS);
-
         enableAnalytics.setOnPreferenceChangeListener(this);
     }
 

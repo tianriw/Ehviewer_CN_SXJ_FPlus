@@ -24,7 +24,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import com.hippo.ehviewer.Analytics;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.text.Html;

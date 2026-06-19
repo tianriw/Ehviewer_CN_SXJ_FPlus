@@ -21,7 +21,7 @@ import android.util.AttributeSet;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.unifile.UniFile;

@@ -30,6 +30,7 @@ import com.hippo.ehviewer.ui.MainActivity;
 import com.hippo.scene.Announcer;
 import com.hippo.scene.StageActivity;
 import com.hippo.util.ExceptionUtils;
+import com.tianri.ehviewer_fplus.R;
 
 public final class UrlOpener {
 

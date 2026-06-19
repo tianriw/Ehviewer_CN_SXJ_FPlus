@@ -34,7 +34,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 
 import com.hippo.ehviewer.AppConfig;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.client.exception.EhException;
 import com.hippo.io.UniFileInputStreamPipe;

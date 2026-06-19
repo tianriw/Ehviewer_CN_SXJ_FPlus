@@ -16,7 +16,7 @@
 
 <resources>
 
-    <string name="app_name">EhViewer</string>
+    <string name="app_name">FPlus-EhViewer</string>
 
     <!-- Theme -->
     <string name="theme_light">亮色主题</string>
@@ -475,6 +475,16 @@
     <string name="page_menu_save">保存</string>
     <string name="page_menu_save_to">保存到 …</string>
     <string name="page_menu_add_bookmark">添加书签</string>
+    <string name="page_menu_bookmark_manage">书签</string>
+    <string name="bookmark_note_hint">备注（可选）</string>
+    <string name="bookmark_edit_note">编辑备注</string>
+    <string name="bookmark_remove">移除书签</string>
+    <string name="bookmark_added">已添加书签</string>
+    <string name="bookmark_removed">已移除书签</string>
+    <string name="bookmarks">书签</string>
+    <string name="no_bookmarks">书签的页面会显示在这里</string>
+    <string name="clear_all_bookmarks">清空全部书签？</string>
+    <string name="bookmark_page_at">第 %1$d 页</string>
     <string name="gallery_menu_title">菜单</string>
     <string name="share_image">分享图片</string>
     <string name="image_saved">图片已保存至 %s</string>
@@ -631,6 +641,40 @@
     <string name="settings_advanced_clear_memory_cache">清理内存缓存</string>
     <string name="settings_advanced_clear_memory_cache_summary">清理缩略图、画廊信息的内存缓存</string>
     <string name="settings_advanced_read_cache_size">阅读缓存大小</string>
+    <string name="settings_download_retry_count">自动重试次数</string>
+    <string name="settings_read_cache_as_download">边看边下</string>
+    <string name="settings_read_cache_as_download_summary">仅将实际显示过的页面保存为永久的部分下载</string>
+    <string name="download_state_read_partial">阅读下载 %1$d/%2$d</string>
+    <string name="sync_cloud_favorites">同步云端收藏</string>
+    <string name="sync_cloud_favorites_done">已同步 %1$d 个云端收藏</string>
+    <string name="sync_cloud_favorites_failed">云端收藏同步失败</string>
+    <string name="settings_auto_sync_cloud_favorites">启动时同步云端收藏</string>
+    <string name="settings_auto_sync_cloud_favorites_summary">每天最多自动同步一次，且不会删除本地收藏</string>
+    <string name="synced_local_favorites">本地 / %1$s</string>
+    <string name="tracking">跟踪</string>
+    <string name="add_tracking_tag">添加本地跟踪 Tag</string>
+    <string name="tracking_mark_all_read">全部标记已读</string>
+    <string name="no_tracking_galleries">暂无新的跟踪图集</string>
+    <string name="tracking_first_title">启用 Tag 跟踪？</string>
+    <string name="tracking_first_message">将定期检查本地和云端 Watched Tag。首次检查仅建立基线，不会导入旧图集。</string>
+    <string name="tracking_check_done">跟踪检查完成：新增 %1$d 个</string>
+    <string name="tracking_check_failed">跟踪检查失败</string>
+    <string name="settings_tracking_interval">Tag 跟踪间隔</string>
+    <string name="settings_tracking_per_tag_limit">每个 Tag 获取上限</string>
+    <string name="settings_tracking_global_limit">单次获取总上限</string>
+    <string name="statistics">我的统计</string>
+    <string name="settings_reading_statistics">本地阅读统计</string>
+    <string name="settings_reading_statistics_summary">记录本地观看事件用于年度统计；关闭后会保留已有数据</string>
+    <string name="previous_year">上一年</string>
+    <string name="next_year">下一年</string>
+    <string name="clear_statistics">清除统计</string>
+    <string name="clear_statistics_confirm">清除全部观看统计？普通阅读历史不会受影响。</string>
+    <string name="statistics_year">%1$d 年度图集</string>
+    <string name="statistics_summary">观看次数：%1$d\n不同图集：%2$d\n最近阅读：%3$s</string>
+    <string name="statistics_never">从未</string>
+    <string name="statistics_no_favorite">还没有最喜欢的图集</string>
+    <string name="statistics_favorite_gallery">最喜欢的图集\n%1$s\n观看 %2$d 次</string>
+    <string name="statistics_top_tags">最喜欢的 Tag（观看次数 / 不同图集）</string>
     <string name="settings_advanced_app_language_title">App 界面语言</string>
     <string name="settings_advanced_proxy">代理</string>
     <string name="settings_advanced_proxy_summary_1">%1$s %2$s:%3$d</string>
@@ -974,5 +1018,30 @@
     <string name="imported_archive_info_title">本地导入信息</string>
     <string name="imported_archive_info_message">这是从本地存储中导入的项目</string>
     <string name="imported_archive_category">本地导入</string>
+    <string name="live_mode">直播模式</string>
+    <string name="settings_live_mode_summary">仅使用三个完全隔离的离线测试图集</string>
+    <string name="live_mode_enable_title">启用直播模式？</string>
+    <string name="live_mode_enable_message">网络与本地图集、历史、收藏、下载、跟踪和统计都会隐藏，仅提供三个离线测试图集。</string>
+    <string name="live_mode_exit">退出直播模式</string>
+    <string name="live_mode_exit_title">退出直播模式？</string>
+    <string name="live_mode_exit_message">请长按确认按钮以返回普通模式。</string>
+    <string name="live_mode_hold_to_exit">长按退出</string>
+    <string name="live_mode_open_failed">无法创建离线测试图集</string>
+    <string name="settings_new_features">新功能</string>
+    <string name="settings_tracking_enabled">Tag 跟踪</string>
+    <string name="settings_tracking_enabled_summary">定时检查本地与云端关注的 Tag</string>
+    <string name="manage_tracking_tags">管理 Tag</string>
+    <string name="tracking_tag_long_press_hint">长按 Tag 可使用快捷操作。</string>
+    <string name="tracking_tag_added">已开始跟踪：%1$s</string>
+    <string name="tracking_tag_already_added">已在跟踪：%1$s</string>
+    <string name="no_tracking_tags">暂无跟踪 Tag</string>
+    <string name="tracking_tag_cloud">云端</string>
+    <string name="tracking_tag_local">本地</string>
+    <string name="enabled">已启用</string>
+    <string name="disabled">已暂停</string>
+    <string name="pause_tracking_tag">暂停跟踪</string>
+    <string name="enable_tracking_tag">启用跟踪</string>
+    <string name="reset_tracking_baseline">重置基线</string>
+    <string name="delete_tracking_tag">删除 Tag</string>
 
 </resources>

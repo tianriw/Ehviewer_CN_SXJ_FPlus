@@ -20,7 +20,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import androidx.annotation.Nullable;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 
 public class LicenseActivity extends ToolbarActivity {
 

@@ -54,7 +54,7 @@ public class SimpleDiskCache {
     private static final int STATE_DISK_CACHE_BUSY = 2;
 
     private final File mCacheDir;
-    private final int mSize;
+    private final long mSize;
     @NonNull
     private final Map<String, CounterLock> mLockMap = new HashMap<>();
     @NonNull
@@ -64,6 +64,10 @@ public class SimpleDiskCache {
     private DiskLruCache mDiskLruCache;
 
     public SimpleDiskCache(File cacheDir, int size) {
+        this(cacheDir, (long) size);
+    }
+
+    public SimpleDiskCache(File cacheDir, long size) {
         mCacheDir = cacheDir;
         mSize = size;
 

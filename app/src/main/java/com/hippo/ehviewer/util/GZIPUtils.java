@@ -7,7 +7,7 @@ import android.content.Context;
 import android.util.Base64;
 import android.widget.Toast;
 
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

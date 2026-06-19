@@ -38,6 +38,8 @@ public abstract class GalleryProvider2 extends GalleryProvider {
 
     public void putStartPage(int page) {}
 
+    public void markPageViewed(int page) {}
+
     /**
      * @return without extension
      */

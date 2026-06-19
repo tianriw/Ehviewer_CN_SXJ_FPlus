@@ -44,6 +44,7 @@ import com.hippo.lib.yorozuya.AssertUtils;
 import com.hippo.lib.yorozuya.FileUtils;
 import com.hippo.lib.yorozuya.MathUtils;
 import com.hippo.lib.yorozuya.NumberUtils;
+import com.tianri.ehviewer_fplus.R;
 
 import java.io.File;
 import java.util.Date;
@@ -1157,6 +1158,74 @@ public class Settings {
         return getIntFromStr(KEY_READ_CACHE_SIZE, DEFAULT_READ_CACHE_SIZE);
     }
 
+    public static final String KEY_DOWNLOAD_RETRY_COUNT = "download_retry_count";
+    public static final int DEFAULT_DOWNLOAD_RETRY_COUNT = 3;
+
+    public static int getDownloadRetryCount() {
+        return getIntFromStr(KEY_DOWNLOAD_RETRY_COUNT, DEFAULT_DOWNLOAD_RETRY_COUNT);
+    }
+
+    public static final String KEY_CACHE_AS_DOWNLOAD = "cache_as_download";
+
+    public static boolean getCacheAsDownload() {
+        return getBoolean(KEY_CACHE_AS_DOWNLOAD, false);
+    }
+
+    public static final String KEY_AUTO_SYNC_CLOUD_FAVORITES = "auto_sync_cloud_favorites";
+    private static final String KEY_LAST_CLOUD_FAVORITES_SYNC = "last_cloud_favorites_sync";
+
+    public static boolean getAutoSyncCloudFavorites() {
+        return getBoolean(KEY_AUTO_SYNC_CLOUD_FAVORITES, false);
+    }
+
+    public static long getLastCloudFavoritesSync() {
+        return getLong(KEY_LAST_CLOUD_FAVORITES_SYNC, 0L);
+    }
+
+    public static void putLastCloudFavoritesSync(long value) {
+        putLong(KEY_LAST_CLOUD_FAVORITES_SYNC, value);
+    }
+
+    public static final String KEY_TRACKING_ENABLED = "tracking_enabled";
+    public static final String KEY_TRACKING_INTERVAL_HOURS = "tracking_interval_hours";
+    public static final String KEY_TRACKING_PER_TAG_LIMIT = "tracking_per_tag_limit";
+    public static final String KEY_TRACKING_GLOBAL_LIMIT = "tracking_global_limit";
+    private static final String KEY_LAST_TRACKING_CHECK = "last_tracking_check";
+
+    public static boolean getTrackingEnabled() {
+        return getBoolean(KEY_TRACKING_ENABLED, false);
+    }
+
+    public static void putTrackingEnabled(boolean value) {
+        putBoolean(KEY_TRACKING_ENABLED, value);
+    }
+
+    public static int getTrackingIntervalHours() {
+        return getIntFromStr(KEY_TRACKING_INTERVAL_HOURS, 6);
+    }
+
+    public static int getTrackingPerTagLimit() {
+        return getIntFromStr(KEY_TRACKING_PER_TAG_LIMIT, 50);
+    }
+
+    public static int getTrackingGlobalLimit() {
+        return getIntFromStr(KEY_TRACKING_GLOBAL_LIMIT, 200);
+    }
+
+    public static long getLastTrackingCheck() {
+        return getLong(KEY_LAST_TRACKING_CHECK, 0L);
+    }
+
+    public static void putLastTrackingCheck(long value) {
+        putLong(KEY_LAST_TRACKING_CHECK, value);
+    }
+
+    public static final String KEY_READING_STATISTICS_ENABLED = "reading_statistics_enabled";
+
+    public static boolean getReadingStatisticsEnabled() {
+        return getBoolean(KEY_READING_STATISTICS_ENABLED, true);
+    }
+
     public static final String KEY_BUILT_IN_HOSTS = "built_in_hosts";
     private static final boolean DEFAULT_BUILT_IN_HOSTS = true;
 
@@ -1518,5 +1587,15 @@ public class Settings {
 
     public static void putUpdateTime(long updateTime) {
         putLong(KEY_LAST_UPDATE_TIME,updateTime);
+    }
+
+    public static final String KEY_LIVE_MODE = "live_mode";
+
+    public static boolean getLiveMode() {
+        return getBoolean(KEY_LIVE_MODE, false);
+    }
+
+    public static void putLiveMode(boolean value) {
+        putBoolean(KEY_LIVE_MODE, value);
     }
 }

@@ -26,7 +26,7 @@ import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 import androidx.annotation.NonNull;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.lib.yorozuya.AnimationUtils;
 import com.hippo.lib.yorozuya.AssertUtils;
 import com.hippo.lib.yorozuya.SimpleAnimatorListener;

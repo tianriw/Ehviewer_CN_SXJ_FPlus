@@ -21,7 +21,7 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.widget.LoadImageView;
 import com.hippo.widget.LoadImageViewNew;
 

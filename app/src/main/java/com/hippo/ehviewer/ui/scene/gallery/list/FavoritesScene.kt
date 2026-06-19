@@ -60,7 +60,7 @@ import com.hippo.easyrecyclerview.EasyRecyclerView.CustomChoiceListener
 import com.hippo.easyrecyclerview.FastScroller.OnDragHandlerListener
 import com.hippo.ehviewer.EhApplication
 import com.hippo.ehviewer.EhDB
-import com.hippo.ehviewer.R
+import com.tianri.ehviewer_fplus.R
 import com.hippo.ehviewer.Settings
 import com.hippo.ehviewer.client.EhClient
 import com.hippo.ehviewer.client.EhEngine
@@ -77,6 +77,7 @@ import com.hippo.ehviewer.ui.dialog.FavoriteListSortDialog
 import com.hippo.ehviewer.ui.scene.BaseScene
 import com.hippo.ehviewer.ui.scene.EhCallback
 import com.hippo.ehviewer.ui.scene.gallery.detail.GalleryDetailScene
+import com.hippo.ehviewer.sync.CloudFavoritesSync
 import com.hippo.ehviewer.widget.EhDrawerLayout
 import com.hippo.ehviewer.widget.GalleryInfoContentHelper
 import com.hippo.ehviewer.widget.JumpDateSelector
@@ -150,6 +151,8 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
 
     private var mFavLocalCount = 0
     private var mFavCountSum = 0
+    private var mSyncedFavCatArray: Array<String?> = arrayOfNulls(10)
+    private var mSyncedFavCountArray: IntArray = IntArray(10)
 
     private var mHasFirstRefresh = false
     private var mSearchMode = false
@@ -197,6 +200,8 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
         mFavCountArray = Settings.getFavCount()
         mFavLocalCount = Settings.getFavLocalCount()
         mFavCountSum = Settings.getFavCloudCount()
+        mSyncedFavCatArray = EhDB.getCloudFavoriteCategoryNames()
+        mSyncedFavCountArray = EhDB.getCloudFavoriteCategoryCounts()
 
         if (savedInstanceState == null) {
             onInit()
@@ -377,6 +382,12 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
         val favCatName: String?
         if (favCat >= 0 && favCat < 10) {
             favCatName = mFavCatArray!![favCat]
+        } else if (FavListUrlBuilder.isLocalCloudFavCat(favCat)) {
+            val slot = FavListUrlBuilder.getLocalCloudSlot(favCat)
+            favCatName = getString(
+                R.string.synced_local_favorites,
+                mSyncedFavCatArray[slot] ?: mFavCatArray!![slot]
+            )
         } else if (favCat == FavListUrlBuilder.FAV_CAT_LOCAL) {
             favCatName = getString(R.string.local_favorites)
         } else {
@@ -467,6 +478,29 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
             override fun onMenuItemClick(item: MenuItem): Boolean {
                 val id = item.getItemId()
                 when (id) {
+                    R.id.action_sync_cloud_favorites -> {
+                        CloudFavoritesSync.sync(context!!, true, object : CloudFavoritesSync.Callback {
+                            override fun onSuccess(imported: Int) {
+                                mSyncedFavCatArray = EhDB.getCloudFavoriteCategoryNames()
+                                mSyncedFavCountArray = EhDB.getCloudFavoriteCategoryCounts()
+                                mDrawerAdapter?.notifyDataSetChanged()
+                                Toast.makeText(
+                                    context,
+                                    getString(R.string.sync_cloud_favorites_done, imported),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                            override fun onFailure(error: Throwable) {
+                                Toast.makeText(
+                                    context,
+                                    R.string.sync_cloud_favorites_failed,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        })
+                        return true
+                    }
                     R.id.action_default_favorites_slot -> {
                         val items = arrayOfNulls<String>(12)
                         items[0] = getString(R.string.let_me_select)
@@ -560,8 +594,12 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
                 return true
             }
 
-            // Local favorite position is 0, All favorite position is 1, so position - 2 is OK
-            val newFavCat = position - 2
+            val newFavCat = if (position >= 12) {
+                FavListUrlBuilder.getLocalCloudFavCat(position - 12)
+            } else {
+                // Local favorite position is 0, All favorite position is 1.
+                position - 2
+            }
 
             // Check is the same
             if (mUrlBuilder!!.getFavCat() == newFavCat) {
@@ -856,7 +894,7 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
                         if (sortDialog == null) {
                             sortDialog = FavoriteListSortDialog(this)
                         }
-                        if (mUrlBuilder!!.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL) {
+                        if (mUrlBuilder!!.isLocalFavCat()) {
                             sortDialog!!.showLocalSort(mResult)
                         } else {
                             sortDialog!!.showCloudSort(mResult)
@@ -1104,7 +1142,13 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
     private fun onGetFavoritesLocal(keyword: String?, taskId: Int) {
         if (mHelper != null && mHelper!!.isCurrentTask(taskId)) {
             val list: MutableList<GalleryInfo?>?
-            if (TextUtils.isEmpty(keyword)) {
+            val favCat = mUrlBuilder?.getFavCat() ?: FavListUrlBuilder.FAV_CAT_LOCAL
+            if (FavListUrlBuilder.isLocalCloudFavCat(favCat)) {
+                list = EhDB.getCloudFavoriteCategory(
+                    FavListUrlBuilder.getLocalCloudSlot(favCat),
+                    keyword
+                )
+            } else if (TextUtils.isEmpty(keyword)) {
                 list = EhDB.getAllLocalFavorites()
             } else {
                 list = EhDB.searchLocalFavorites(keyword)
@@ -1116,7 +1160,7 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
                 mHelper!!.onGetPageData(taskId, 1, 0, list)
             }
 
-            if (TextUtils.isEmpty(keyword)) {
+            if (favCat == FavListUrlBuilder.FAV_CAT_LOCAL && TextUtils.isEmpty(keyword)) {
                 mFavLocalCount = list.size
                 Settings.putFavLocalCount(mFavLocalCount)
                 if (mDrawerAdapter != null) {
@@ -1145,7 +1189,7 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
 
             mRecyclerView!!.outOfCustomChoiceMode()
 
-            if (mUrlBuilder!!.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL) { // Delete local fav
+            if (mUrlBuilder!!.isLocalFavCat()) { // Delete local fav
                 val gidArray = LongArray(mModifyGiList.size)
                 var i = 0
                 val n = mModifyGiList.size
@@ -1188,7 +1232,8 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
 
             mRecyclerView!!.outOfCustomChoiceMode()
 
-            if (srcCat == FavListUrlBuilder.FAV_CAT_LOCAL) { // Move from local to cloud
+            if (srcCat == FavListUrlBuilder.FAV_CAT_LOCAL
+                || FavListUrlBuilder.isLocalCloudFavCat(srcCat)) { // Move from local to cloud
                 val gidArray = LongArray(mModifyGiList.size)
                 var i = 0
                 val n = mModifyGiList.size
@@ -1243,7 +1288,7 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
             if (mEnableModify) {
                 mEnableModify = false
 
-                val local = mUrlBuilder!!.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL
+                val local = mUrlBuilder!!.isLocalFavCat()
 
                 if (mModifyAdd) {
                     val gidArray = LongArray(mModifyGiList.size)
@@ -1302,7 +1347,7 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
                     request.setArgs(url, gidArray, mModifyFavCat, Settings.getShowJpnTitle())
                     mClient!!.execute(request)
                 }
-            } else if (mUrlBuilder!!.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL) {
+            } else if (mUrlBuilder!!.isLocalFavCat()) {
                 val keyword = mUrlBuilder!!.getKeyword()
                 SimpleHandler.getInstance().post(Runnable { onGetFavoritesLocal(keyword, taskId) })
             } else {
@@ -1356,7 +1401,7 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
             if (mEnableModify) {
                 mEnableModify = false
 
-                val local = mUrlBuilder!!.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL
+                val local = mUrlBuilder!!.isLocalFavCat()
 
                 val gidArray = LongArray(mModifyGiList.size)
                 if (mModifyAdd) {
@@ -1415,7 +1460,7 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
                     request.setArgs(url, gidArray, mModifyFavCat, Settings.getShowJpnTitle())
                     mClient!!.execute(request)
                 }
-            } else if (mUrlBuilder!!.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL) {
+            } else if (mUrlBuilder!!.isLocalFavCat()) {
                 val keyword = mUrlBuilder!!.getKeyword()
                 SimpleHandler.getInstance().post(object : Runnable {
                     override fun run() {
@@ -1589,7 +1634,7 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
                 return GalleryInfo()
             }
             // local favorities
-            if (mUrlBuilder!!.getFavCat() == FavListUrlBuilder.FAV_CAT_LOCAL) {
+            if (mUrlBuilder!!.isLocalFavCat()) {
                 val keyword = mUrlBuilder!!.getKeyword()
                 val gInfoL: MutableList<GalleryInfo?>?
                 if (TextUtils.isEmpty(keyword)) {
@@ -1703,7 +1748,15 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
 
         @SuppressLint("SetTextI18n")
         override fun onBindViewHolder(holder: FavDrawerHolder, position: Int) {
-            if (0 == position) {
+            if (position >= 12) {
+                val slot = position - 12
+                holder.key.text = getString(
+                    R.string.synced_local_favorites,
+                    mSyncedFavCatArray[slot] ?: mFavCatArray?.get(slot).orEmpty()
+                )
+                holder.value.text = mSyncedFavCountArray[slot].toString()
+                holder.itemView.isEnabled = true
+            } else if (0 == position) {
                 holder.key.setText(R.string.local_favorites)
                 holder.value.setText(mFavLocalCount.toString())
                 holder.itemView.setEnabled(true)
@@ -1725,7 +1778,7 @@ class FavoritesScene : BaseScene(), EasyRecyclerView.OnItemClickListener,
             if (null == mFavCatArray) {
                 return 2
             }
-            return 12
+            return 22
         }
     }
 

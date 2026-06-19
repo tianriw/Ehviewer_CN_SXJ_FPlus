@@ -17,7 +17,7 @@
 
 <resources>
 
-    <string name="app_name">EhViewer</string>
+    <string name="app_name">FPlus-EhViewer</string>
 
     <string name="site_e" translatable="false">e-hentai</string>
     <string name="site_ex" translatable="false">exhentai</string>
@@ -36,7 +36,6 @@
     <string name="downloads">下載</string>
     <string name="news">新聞</string>
     <string name="settings">設定</string>
-    <string name="stub" translatable="false">Stub</string>
 
     <string name="username">使用者名稱</string>
     <string name="password">密碼</string>

@@ -19,6 +19,8 @@ package com.hippo.ehviewer.gallery;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.hippo.ehviewer.EhApplication;
+import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.data.GalleryInfo;
 import com.hippo.ehviewer.spider.SpiderQueen;
 import com.hippo.lib.glgallery.GalleryProvider;
@@ -26,18 +28,33 @@ import com.hippo.lib.image.Image;
 //import com.hippo.lib.image.Image1;
 import com.hippo.unifile.UniFile;
 import com.hippo.lib.yorozuya.SimpleHandler;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 public class EhGalleryProvider extends GalleryProvider2 implements SpiderQueen.OnSpiderListener {
 
     private final Context mContext;
     private final GalleryInfo mGalleryInfo;
     @Nullable
+    private final Runnable mReadingRecordedListener;
+    private volatile boolean mReadingRecorded;
+    @Nullable
     private SpiderQueen mSpiderQueen;
+    private final Set<Integer> mViewedPages = Collections.synchronizedSet(new HashSet<>());
+    private final Set<Integer> mPromotedPages = Collections.synchronizedSet(new HashSet<>());
 
     public EhGalleryProvider(Context context, GalleryInfo galleryInfo) {
+        this(context, galleryInfo, false, null);
+    }
+
+    public EhGalleryProvider(Context context, GalleryInfo galleryInfo, boolean readingRecorded,
+                             @Nullable Runnable readingRecordedListener) {
         mContext = context;
         mGalleryInfo = galleryInfo;
+        mReadingRecorded = readingRecorded;
+        mReadingRecordedListener = readingRecordedListener;
     }
 
     @Override
@@ -99,6 +116,50 @@ public class EhGalleryProvider extends GalleryProvider2 implements SpiderQueen.O
         if (mSpiderQueen != null) {
             mSpiderQueen.putStartPage(page);
         }
+    }
+
+    @Override
+    public void markPageViewed(int page) {
+        if (page < 0) {
+            return;
+        }
+        mViewedPages.add(page);
+        if (Settings.getCacheAsDownload()) {
+            promoteViewedPage(page);
+        }
+        recordReadingIfReady(page);
+    }
+
+    private void recordReadingIfReady(int index) {
+        SpiderQueen queen = mSpiderQueen;
+        if (mReadingRecorded || !mViewedPages.contains(index)
+                || !Settings.getReadingStatisticsEnabled() || queen == null
+                || !queen.isPageFinished(index)) {
+            return;
+        }
+        mReadingRecorded = true;
+        EhApplication.getExecutorService(mContext).execute(() ->
+                com.hippo.ehviewer.stats.StatisticsManager.recordView(mGalleryInfo));
+        if (mReadingRecordedListener != null) {
+            mReadingRecordedListener.run();
+        }
+    }
+
+    private void promoteViewedPage(int index) {
+        SpiderQueen queen = mSpiderQueen;
+        if (queen == null || !mViewedPages.contains(index) || !mPromotedPages.add(index)) {
+            return;
+        }
+        EhApplication.getExecutorService(mContext).execute(() -> {
+            if (queen.promoteReadPage(index)) {
+                int total = Math.max(queen.size(), 0);
+                int downloaded = queen.getDownloadedPageCount();
+                EhApplication.getDownloadManager(mContext)
+                        .markReadPageDownloaded(mGalleryInfo, downloaded, total);
+            } else {
+                mPromotedPages.remove(index);
+            }
+        });
     }
 
     @Override
@@ -174,6 +235,7 @@ public class EhGalleryProvider extends GalleryProvider2 implements SpiderQueen.O
     @Override
     public void onPageSuccess(int index, int finished, int downloaded, int total) {
         notifyDataChanged(index);
+        promoteViewedPage(index);
     }
 
     @Override
@@ -188,6 +250,7 @@ public class EhGalleryProvider extends GalleryProvider2 implements SpiderQueen.O
     @Override
     public void onGetImageSuccess(int index, Image image) {
         notifyPageSucceed(index, image);
+        recordReadingIfReady(index);
     }
 
     @Override

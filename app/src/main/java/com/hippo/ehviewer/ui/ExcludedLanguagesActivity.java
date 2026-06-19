@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhConfig;
 import com.hippo.ripple.Ripple;

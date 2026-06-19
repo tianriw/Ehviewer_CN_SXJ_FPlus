@@ -23,7 +23,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 
 public abstract class ToolbarActivity extends EhActivity {

@@ -40,7 +40,7 @@ import com.hippo.conaco.ConacoTask;
 import com.hippo.conaco.Unikery;
 import com.hippo.drawable.PreciselyClipDrawable;
 import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.lib.image.Image;
 import com.hippo.util.DrawableManager;
 

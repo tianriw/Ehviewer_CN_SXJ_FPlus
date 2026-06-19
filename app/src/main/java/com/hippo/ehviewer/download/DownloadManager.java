@@ -647,6 +647,47 @@ public class DownloadManager implements SpiderQueen.OnSpiderListener {
         mAllInfoMap.put(galleryInfo.gid, info);
     }
 
+    public synchronized void markReadPageDownloaded(GalleryInfo galleryInfo, int downloaded, int total) {
+        DownloadInfo info = mAllInfoMap.get(galleryInfo.gid);
+        final boolean isNew = (info == null);
+        if (isNew) {
+            info = new DownloadInfo(galleryInfo);
+            info.label = null;
+            info.time = System.currentTimeMillis();
+            mDefaultInfoList.addFirst(info);
+            mAllInfoList.addFirst(info);
+            mAllInfoMap.put(info.gid, info);
+            mLabelCountMap.put(null, (long) mDefaultInfoList.size());
+        } else {
+            info.updateInfo(galleryInfo);
+        }
+        if (info.state != DownloadInfo.STATE_DOWNLOAD
+                && info.state != DownloadInfo.STATE_WAIT
+                && info.state != DownloadInfo.STATE_FINISH) {
+            info.state = DownloadInfo.STATE_PARTIAL;
+        }
+        info.legacy = Math.max(downloaded, 1);
+        info.finished = info.legacy;
+        info.downloaded = info.legacy;
+        info.total = total;
+        EhDB.putDownloadInfo(info);
+        // Listener callbacks touch RecyclerView — must run on main thread.
+        final DownloadInfo finalInfo = info;
+        final List<DownloadInfo> list = getInfoListForLabel(info.label);
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (isNew) {
+                for (DownloadInfoListener listener : mDownloadInfoListeners) {
+                    listener.onAdd(finalInfo, mDefaultInfoList, 0);
+                }
+            }
+            if (list != null) {
+                for (DownloadInfoListener listener : mDownloadInfoListeners) {
+                    listener.onUpdate(finalInfo, list, mWaitList);
+                }
+            }
+        });
+    }
+
 
     public void stopDownload(long gid) {
         DownloadInfo info = stopDownloadInternal(gid);

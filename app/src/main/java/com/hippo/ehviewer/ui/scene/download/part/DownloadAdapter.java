@@ -39,7 +39,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.ehviewer.EhDB;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhCacheKeyFactory;
 import com.hippo.ehviewer.client.EhUtils;
@@ -285,6 +285,15 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
                 break;
             case DownloadInfo.STATE_FINISH:
                 bindState(holder, info, resources.getString(R.string.download_state_finish));
+                break;
+            case DownloadInfo.STATE_PARTIAL:
+                int total = info.total;
+                SpiderInfo spiderInfo = mCallback.getSpiderInfoMap().get(info.gid);
+                if (total <= 0 && spiderInfo != null) {
+                    total = spiderInfo.pages;
+                }
+                bindState(holder, info, resources.getString(
+                        R.string.download_state_read_partial, info.legacy, Math.max(total, 0)));
                 break;
         }
     }

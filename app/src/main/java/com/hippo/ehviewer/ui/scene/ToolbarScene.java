@@ -29,7 +29,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.widget.Toolbar;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 
 public abstract class ToolbarScene extends BaseScene {
 

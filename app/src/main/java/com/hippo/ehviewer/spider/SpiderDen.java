@@ -19,6 +19,7 @@ package com.hippo.ehviewer.spider;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.os.Looper;
+import android.os.StatFs;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
@@ -61,10 +62,29 @@ public final class SpiderDen {
 
     @Nullable
     private static SimpleDiskCache sCache;
+    @Nullable
+    private static File sCacheDir;
+    private static final long MIN_CACHE_FREE_BYTES = 1024L * 1024L * 1024L;
 
     public static void initialize(Context context) {
-        sCache = new SimpleDiskCache(new File(context.getCacheDir(), "image"),
-                MathUtils.clamp(Settings.getReadCacheSize(), 40, 640) * 1024 * 1024);
+        sCacheDir = new File(context.getCacheDir(), "image");
+        int configuredSize = Settings.getReadCacheSize();
+        long maxSize = configuredSize < 0
+                ? Long.MAX_VALUE
+                : MathUtils.clamp(configuredSize, 40, 640) * 1024L * 1024L;
+        sCache = new SimpleDiskCache(sCacheDir, maxSize);
+    }
+
+    public static boolean canWriteReadCache() {
+        File cacheDir = sCacheDir;
+        if (cacheDir == null) {
+            return false;
+        }
+        try {
+            return new StatFs(cacheDir.getAbsolutePath()).getAvailableBytes() >= MIN_CACHE_FREE_BYTES;
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 
     public static class StartWithFilenameFilter implements FilenameFilter {
@@ -308,9 +328,47 @@ public final class SpiderDen {
         }
     }
 
+    public boolean promoteToDownload(int index) {
+        synchronized (mDownloadDirLock) {
+            if (mDownloadDir == null) {
+                mDownloadDir = getGalleryDownloadDir(mGalleryInfo);
+            }
+            if (mDownloadDir == null || !mDownloadDir.ensureDir()) {
+                return false;
+            }
+        }
+        return containInDownloadDir(index) || copyFromCacheToDownloadDir(index);
+    }
+
+    public int getDownloadedPageCount() {
+        UniFile dir = getDownloadDir();
+        if (dir == null) {
+            return 0;
+        }
+        UniFile[] files = dir.listFiles();
+        if (files == null) {
+            return 0;
+        }
+        int count = 0;
+        for (UniFile file : files) {
+            String name = file.getName();
+            if (name == null) {
+                continue;
+            }
+            for (String extension : GalleryProvider2.SUPPORT_IMAGE_EXTENSIONS) {
+                if (name.endsWith(extension)) {
+                    count++;
+                    break;
+                }
+            }
+        }
+        return count;
+    }
+
     public boolean contain(int index) {
         if (mMode == SpiderQueen.MODE_READ) {
-            return containInCache(index) || containInDownloadDir(index);
+            return containInCache(index)
+                    || EhDB.getDownloadDirname(mGid) != null && containInDownloadDir(index);
         } else if (mMode == SpiderQueen.MODE_DOWNLOAD) {
             return containInDownloadDir(index) || copyFromCacheToDownloadDir(index);
         } else {
@@ -352,7 +410,7 @@ public final class SpiderDen {
 
     @Nullable
     private OutputStreamPipe openCacheOutputStreamPipe(int index) {
-        if (sCache == null) {
+        if (sCache == null || !canWriteReadCache()) {
             return null;
         }
 
@@ -386,8 +444,10 @@ public final class SpiderDen {
     @Nullable
     public OutputStreamPipe openOutputStreamPipe(int index, @Nullable String extension) {
         if (mMode == SpiderQueen.MODE_READ) {
-            // Return the download pipe is the gallery has been downloaded
-            OutputStreamPipe pipe = openDownloadOutputStreamPipe(index, extension);
+            OutputStreamPipe pipe = null;
+            if (EhDB.getDownloadDirname(mGid) != null) {
+                pipe = openDownloadOutputStreamPipe(index, extension);
+            }
             if (pipe == null) {
                 pipe = openCacheOutputStreamPipe(index);
             }
@@ -432,7 +492,10 @@ public final class SpiderDen {
     @Nullable
     public InputStreamPipe openInputStreamPipe(int index) {
         if (mMode == SpiderQueen.MODE_READ) {
-            InputStreamPipe pipe = openDownloadInputStreamPipe(index);
+            InputStreamPipe pipe = null;
+            if (EhDB.getDownloadDirname(mGid) != null) {
+                pipe = openDownloadInputStreamPipe(index);
+            }
             if (pipe == null) {
                 pipe = openCacheInputStreamPipe(index);
             }

@@ -20,7 +20,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.widget.SimpleRatingView;
 import com.hippo.widget.LoadImageView;
 

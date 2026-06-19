@@ -25,7 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.hippo.android.resource.AttrResources;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.lib.yorozuya.ViewUtils;
 

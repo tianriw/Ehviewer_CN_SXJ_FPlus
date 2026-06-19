@@ -55,6 +55,8 @@ import com.hippo.ehviewer.client.data.userTag.UserTagList;
 import com.hippo.ehviewer.download.ArchiverDownloadCompleter;
 import com.hippo.ehviewer.download.DownloadManager;
 import com.hippo.ehviewer.spider.SpiderDen;
+import com.hippo.ehviewer.sync.CloudFavoritesSync;
+import com.hippo.ehviewer.sync.TrackingManager;
 import com.hippo.ehviewer.ui.CommonOperations;
 import com.hippo.lib.image.Image;
 //import com.hippo.lib.image.Image1;
@@ -184,6 +186,10 @@ public class EhApplication extends RecordingApplication {
         SpiderDen.initialize(this);
         EhDB.initialize(this);
         EhEngine.initialize();
+        if (!Settings.getLiveMode()) {
+            CloudFavoritesSync.sync(this, false, null);
+            TrackingManager.check(this, false, null);
+        }
         BitmapUtils.initialize(this);
 //        Image1.initialize(this);
         Image.initialize(this);
@@ -196,7 +202,7 @@ public class EhApplication extends RecordingApplication {
             EhDB.mergeOldDB(this);
         }
 
-        if (Settings.getEnableAnalytics()) {
+        if (!Settings.getLiveMode() && Settings.getEnableAnalytics()) {
             Analytics.start(this);
         }
 
@@ -233,7 +239,9 @@ public class EhApplication extends RecordingApplication {
         }.executeOnExecutor(IoThreadPoolExecutor.Companion.getInstance());
 
         // Check app update
-        update();
+        if (!Settings.getLiveMode()) {
+            update();
+        }
 
         // Update version code
         try {
@@ -782,4 +790,3 @@ public class EhApplication extends RecordingApplication {
     }
 
 }
-

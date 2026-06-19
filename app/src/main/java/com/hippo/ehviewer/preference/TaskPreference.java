@@ -30,7 +30,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.customview.view.AbsSavedState;
 import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.preference.DialogPreference;
 import com.hippo.util.IoThreadPoolExecutor;
 import com.hippo.lib.yorozuya.IntIdGenerator;

@@ -11,7 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.client.data.EhTopListDetail;
 import com.hippo.ehviewer.client.data.topList.TopListInfo;
 import com.hippo.ehviewer.client.data.topList.TopListItem;

@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 
 import java.util.Calendar;
 

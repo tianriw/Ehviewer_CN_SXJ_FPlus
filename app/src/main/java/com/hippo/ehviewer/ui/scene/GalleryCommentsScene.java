@@ -57,7 +57,7 @@ import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.LinearDividerItemDecoration;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.UrlOpener;
 import com.hippo.ehviewer.client.EhClient;
 import com.hippo.ehviewer.client.EhRequest;

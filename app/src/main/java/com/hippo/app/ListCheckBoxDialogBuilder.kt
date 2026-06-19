@@ -23,7 +23,7 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.ListView
 import androidx.appcompat.app.AlertDialog
-import com.hippo.ehviewer.R
+import com.tianri.ehviewer_fplus.R
 import com.hippo.lib.yorozuya.ViewUtils
 
 class ListCheckBoxDialogBuilder @SuppressLint("InflateParams") constructor(

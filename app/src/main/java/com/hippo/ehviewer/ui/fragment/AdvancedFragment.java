@@ -34,7 +34,7 @@ import androidx.preference.Preference;
 import com.hippo.ehviewer.AppConfig;
 import com.hippo.ehviewer.EhApplication;
 import com.hippo.ehviewer.EhDB;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.ui.wifi.WiFiClientActivity;
 import com.hippo.ehviewer.ui.wifi.WiFiServerActivity;
 import com.hippo.ehviewer.widget.ProgressHelper;

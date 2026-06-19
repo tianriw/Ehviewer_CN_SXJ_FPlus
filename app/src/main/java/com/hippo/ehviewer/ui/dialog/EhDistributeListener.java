@@ -6,7 +6,7 @@
 //import android.net.Uri;
 //import android.widget.Toast;
 //
-//import com.hippo.ehviewer.R;
+//import com.tianri.ehviewer_fplus.R;
 //import com.hippo.ehviewer.Settings;
 //import com.microsoft.appcenter.distribute.Distribute;
 //import com.microsoft.appcenter.distribute.DistributeListener;

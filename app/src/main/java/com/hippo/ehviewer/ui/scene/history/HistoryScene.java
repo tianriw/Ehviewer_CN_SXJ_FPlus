@@ -50,7 +50,7 @@ import com.hippo.easyrecyclerview.FastScroller;
 import com.hippo.easyrecyclerview.HandlerDrawable;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
 import com.hippo.ehviewer.EhDB;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.Settings;
 import com.hippo.ehviewer.client.EhCacheKeyFactory;
 import com.hippo.ehviewer.client.EhUtils;

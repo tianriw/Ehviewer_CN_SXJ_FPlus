@@ -25,7 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 import com.hippo.ehviewer.EhApplication;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.client.EhClient;
 import com.hippo.ehviewer.client.EhRequest;
 import com.hippo.ehviewer.client.data.TorrentDownloadMessage;

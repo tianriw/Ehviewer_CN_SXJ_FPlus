@@ -40,7 +40,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.easyrecyclerview.EasyRecyclerView;
 import com.hippo.easyrecyclerview.MarginItemDecoration;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ehviewer.client.data.ListUrlBuilder;
 import com.hippo.ehviewer.client.exception.EhException;
 import com.hippo.ripple.Ripple;

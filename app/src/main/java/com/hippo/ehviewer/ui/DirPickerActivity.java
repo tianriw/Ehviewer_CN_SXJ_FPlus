@@ -29,7 +29,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import com.hippo.android.resource.AttrResources;
 import com.hippo.ehviewer.AppConfig;
-import com.hippo.ehviewer.R;
+import com.tianri.ehviewer_fplus.R;
 import com.hippo.ripple.Ripple;
 import com.hippo.widget.DirExplorer;
 import com.hippo.lib.yorozuya.FileUtils;

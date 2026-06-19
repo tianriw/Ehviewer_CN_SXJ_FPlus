@@ -16,7 +16,7 @@
 package com.hippo.util
 
 import com.hippo.ehviewer.GetText
-import com.hippo.ehviewer.R
+import com.tianri.ehviewer_fplus.R
 import com.hippo.ehviewer.client.exception.EhException
 import com.hippo.network.StatusCodeException
 import org.apache.http.conn.ConnectTimeoutException

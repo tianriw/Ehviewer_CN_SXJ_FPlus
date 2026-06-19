@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.alibaba.fastjson.JSONObject
 import com.hippo.ehviewer.Analytics
-import com.hippo.ehviewer.R
+import com.tianri.ehviewer_fplus.R
 import com.hippo.ehviewer.client.EhRequestBuilder
 import com.hippo.ehviewer.updater.AppUpdater
 import com.hippo.lib.yorozuya.IOUtils
